@@ -1,0 +1,34 @@
+This is just a random text file that can be read to exercise the jedit program.
+I copied some stuff from the README file.
+
+-------------------------------------------------------------------------------
+
+  jeditor = proj
+  +-- code_jeditor = master library
+  |   +-- src
+  |       |-- data
+  |       |   +-- jeditor_data
+  |       |       +-- just_a_random_text_file.txt
+  |       |-- main
+  |       |   +-- java
+  |       |       +-- my_proj = sort of my company
+  |       |           |-- jeditor = holder of top level program
+  |       |           |   +-- jedit.java = top level program
+  |       |           +-- my_lib = grouping of libraries
+  |       |               |-- lib              = second level grouping with Java files
+  |       |               |-- lib_encrypt      = second level grouping with sub-grouping
+  |       |               |   + call_gpg       = third  level grouping with Java files
+  |       |               |-- lib_swing        = second level grouping with Java files
+  |       |               |-- lib_swing_editor = second level grouping with Java files
+  |       |               +-- lib_zz_in_code_resource = resources
+  |       +-- test
+  |           +-- Nothing here
+  +-- code_hello_world = secondary library added to see how multiple libraries fit together
+      +-- src
+          +-- main
+              +-- java
+                  +-- my_proj = sort of my company
+                      +-- demo = top grouping
+                          +-- hello_world = second level grouping
+                              +-- HelloWorld.java = only java file in library
+

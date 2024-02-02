@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    This is an ant build file to compile test git for editor.
+    Do:
+       cd <dir_with_this_build.xml>
+       ant
+-->
+<project name="all_java" default="Main Build" basedir="..">
+
+    <property name="codeJeditor"        location="${basedir}/code_jeditor/src/main/java" />
+    <property name="codeMyLib"          location="${basedir}/code_my_lib/src/main/java" />
+    <property name="bin"                location="/tmp/zz_jedit_bin" />
+    <property name="jarfile"            location="${basedir}/target/jeditor.jar" />
+    <property name="jdkDir"             location="/etc/alternatives/java_sdk_openjdk" />
+    <property name="javacVersion"       location="${jdkDir}/bin/javac" />
+    <property name="build.comiler"      value="org.eclipse.jdt.core.JDTComilerAdapter" />
+
+<!-- Initialize by removing old bin stuff -->
+  <target name="Initialize">
+    <delete dir="${bin}" />
+    <mkdir dir="${bin}" />
+    <delete file="${jarfile}" />
+  </target>
+
+<!-- Compile the library -->
+  <target name="CompileMyLib" depends="Initialize">
+    <javac executable="${javacVersion}" fork="yes" srcdir="${codeMyLib}" destdir="${bin}" includeAntRuntime="false">
+      <compilerarg value="-Xlint" />
+    </javac>
+<!-- Copy resources -->
+    <copy todir="${bin}/my_proj/my_lib_resources">
+      <fileset dir="${codeMyLib}/my_proj/my_lib_resources" />
+    </copy>
+<!-- Copy resources
+    <copy todir="${bin}" >
+      <fileset dir="${codeMyLib}" >
+        <exclude name="**/*.java" />
+      </fileset>
+    </copy>
+-->
+  </target>
+
+<!-- Compile the program and copy resources -->
+  <target name="CompileJeditor" depends="Initialize">
+<!-- Compile -->
+    <javac executable="${javacVersion}" fork="yes" srcdir="${codeJeditor}" destdir="${bin}" includeAntRuntime="false">
+      <compilerarg value="-Xlint" />
+    </javac>
+  </target>
+
+<!-- Create the jar and clean up -->
+  <target name="CreateJar" depends="CompileMyLib, CompileJeditor">
+    <jar destfile="${jarfile}">
+      <fileset dir="${bin}" />
+    </jar>
+    <delete dir="${bin}" />
+  </target>
+
+<!-- Top of build -->
+  <target name ="Main Build" depends="CreateJar">
+    <echo message="Main Build Complete:" />
+  </target>
+
+</project>

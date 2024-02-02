@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#set -x
+
+PATH=.:/usr/bin
+javapath="java"
+classpath="../target/jeditor.jar"
+
+if  [ ! -d "${classpath}" -a ! -f "${classpath}" ]; then echo "error: ${classpath} does not exist"; exit; fi
+
+${javapath} -cp ${classpath} my_proj.jeditor.jedit \
+ -file '../code_jeditor/src/test/jeditor_data/encrypted_file_pw_ABCD.gpg' \
+ -ops \
+ -enrw \
+ -pw 'ABCD' \
+ -dir '/tmp' \
+ -sizex 600 \
+ -sizey 900
+
+if [ "$?" != "0" ]; then
+  echo "editor: error: Can not run"
+  exit 1
+fi
+
