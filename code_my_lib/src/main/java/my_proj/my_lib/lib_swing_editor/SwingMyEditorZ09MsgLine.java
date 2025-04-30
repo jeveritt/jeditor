@@ -33,54 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-//---------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------
-//------------------------  CLASS: myMsgLineLayoutManager  -------------------------------
-//---------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------
-/**
- * This class
- *
- * @author James Everitt
- */
-final class myMsgLineLayoutManager implements LayoutManager {
-  
-//  private static final boolean DO_TRACE = true;
-  
-  final int sectSep = 20;
-
-  @Override public void addLayoutComponent(String name, Component comp) { }
-
-  @Override public void removeLayoutComponent(Component comp) { }
-
-  @Override public Dimension minimumLayoutSize(Container parent) { return new Dimension(300,200); }
-
-  @Override public Dimension preferredLayoutSize(Container parent)
-  {
-    Component[] comps = parent.getComponents();
-    Dimension prefSize = new Dimension(0,0);
-    for ( Component comp : comps ) {
-      Dimension compPref = comp.getPreferredSize();
-      if ( prefSize.height < compPref.height ) prefSize.height = compPref.height;
-      prefSize.width += compPref.width + this.sectSep;
-    }
-    return prefSize;
-  } //End: Method
-
-  @Override public void layoutContainer(Container parent) {
-    Component[] comps = parent.getComponents();
-    Component mode = comps[0];
-    Component msg = comps[1];
-    Dimension modePref = mode.getPreferredSize();
-    Dimension size = parent.getSize();
-    mode.setBounds(0, 0, modePref.width, size.height);
-    msg.setBounds(modePref.width + this.sectSep, 0, size.width-modePref.width-this.sectSep, size.height);
-//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + "\n mode= " + mode + "\n msg= " + msg);
-  } //End: Method
-
-} //End: class myMsgLineLayoutManager
-
-
 //--------------------------------------------------------------------
 //------------------  CLASS: SwingMyEditorZ07MsgLine  ------------------
 //--------------------------------------------------------------------
@@ -90,10 +42,11 @@ final class myMsgLineLayoutManager implements LayoutManager {
  * @author James Everitt
  */
 final class SwingMyEditorZ09MsgLine extends JPanel {
-//
-  static final long serialVersionUID = 0;
+
+  private static final long serialVersionUID = -2597574657608999675L;
   
   private JLabel myMode = null;
+  private JLabel myWritable = null;
   private JLabel myMsg = null;
 
 
@@ -111,15 +64,18 @@ final class SwingMyEditorZ09MsgLine extends JPanel {
   {
     super();
 //
+    this.myWritable = new JLabel("Write");
+    this.add(this.myWritable);
+//
     this.myMode = new JLabel("Mode");
     this.add(this.myMode);
-    this.mySetMode(SwingMyEditorZ07TextArea.MY_MODES.INSERT);
+    this.mySetMode(SwingMyEditorZ07TextArea.MY_MODES.ins);
 //
     this.myMsg = new JLabel("Msg");
     this.add(this.myMsg);
     this.mySetMsg(null);
 //
-    this.setLayout( new myMsgLineLayoutManager() );
+    this.setLayout( new MyMsgLineLayoutManager() );
 //
     this.repaint();
   } //End: Method
@@ -129,6 +85,7 @@ final class SwingMyEditorZ09MsgLine extends JPanel {
 /**
  * This method ?
  *
+ * @param msg  ?
  */
   final void mySetMsg ( String msg ) {
     if ( msg == null ) this.myMsg.setText("Msg:"); else this.myMsg.setText("Msg: " + msg);
@@ -139,10 +96,73 @@ final class SwingMyEditorZ09MsgLine extends JPanel {
 /**
  * This method ?
  *
+ * @param mode  ?
  */
   final void mySetMode ( SwingMyEditorZ07TextArea.MY_MODES mode ) {
     this.myMode.setText("Mode: " + mode.toString() );
   }
 
 
+//------------------  Method ------------------
+/**
+ * This method ?
+ *
+ * @param val  ?
+ */
+  final void mySetWritable ( boolean val ) {
+    this.myWritable.setText("Write: " + val );
+  }
+
 } //End: Class SwingMyEditorZ07MsgLine
+
+
+
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+//------------------------  CLASS: MyMsgLineLayoutManager  -------------------------------
+//---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
+/**
+* This class
+*
+* @author James Everitt
+*/
+final class MyMsgLineLayoutManager implements LayoutManager {
+
+  @Override public void addLayoutComponent(String name, Component comp) { }
+
+  @Override public void removeLayoutComponent(Component comp) { }
+
+  @Override public Dimension preferredLayoutSize(Container parent)
+  {
+    int width = parent.getParent().getPreferredSize().width;
+    int height = parent.getComponent(0).getPreferredSize().height;
+    return new Dimension(width, height);
+  }
+
+  @Override public Dimension minimumLayoutSize(Container parent) { return new Dimension(300,200); }
+
+  @Override public void layoutContainer(Container parent) {
+    Component[] comps = parent.getComponents();
+//
+    Dimension prefSize = this.preferredLayoutSize(parent);
+    int totalWidth = prefSize.width;
+    int height = prefSize.height;
+//
+    int x = 5;
+    int space = 10;
+//
+    int compW = comps[0].getPreferredSize().width;
+    comps[0].setBounds(x, 0, compW, height);
+    x += compW + space;
+//
+    compW = comps[1].getPreferredSize().width;
+    comps[1].setBounds(x, 0, compW, height);
+    x += compW + space;
+//
+    compW = totalWidth - x - 5;
+    comps[2].setBounds(x, 0, compW, height);
+  } //End: Method
+
+} //End: class MyMsgLineLayoutManager
+

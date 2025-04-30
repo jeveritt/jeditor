@@ -30,6 +30,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JTextField;
 
+import my_proj.my_lib.lib.MyTrace;
+
 
 //--------------------------------------------------------------------
 //------------------  CLASS: SwingMyEditorZ06CmdLine  ------------------
@@ -40,9 +42,11 @@ import javax.swing.JTextField;
  * @author James Everitt
  */
 final class SwingMyEditorZ08CmdLine extends JTextField {
-//
-  static final long serialVersionUID = 0;
   
+//  private static final boolean DO_TRACE = true;
+  
+  private static final long serialVersionUID = -7505439763844420457L;
+
   private SwingMyEditorZ07TextArea myTextArea = null;
   
   private SwingMyEditorZ09MsgLine  myMsgLine = null;
@@ -77,8 +81,8 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
 /**
  * This method ?
  * 
- * @param cmdLine  ?
- *
+ * @param textArea  ?
+ * @param msgLine  ?
  */
   final void mySetTextAreaAndMsgLines( SwingMyEditorZ07TextArea textArea, SwingMyEditorZ09MsgLine msgLine ) { this.myTextArea = textArea; this.myMsgLine = msgLine; }
 
@@ -87,6 +91,7 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
 /**
  * This  method ?
  *
+ * @param e  ?
  */
   private final void myHandle01KeyTyped ( KeyEvent e )
   {
@@ -96,9 +101,10 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
 // Hitting enter reads the line and does the command
     if ( e.getKeyChar() == KeyEvent.VK_ENTER ) {
 // Return caret to text editor
-      SwingMyEditorZ04JPanel.mySetCaretTo(this.myTextArea);
+      SwingMyEditorZ07TextArea.mySetCaretTo(this.myTextArea);
 // Let text area handle this
       String txt = super.getText();
+      if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": saw return" + ": txt= " + txt );
       super.setText("");
       if ( txt != null && txt.length() > 0 ) this.myHandle02CmdLnInput(txt);
     }
@@ -113,7 +119,9 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
  */
   private final void myHandle02CmdLnInput( String cmd )
   {
-    if ( cmd.charAt(0) == '/' && cmd.length() > 1 ) this.myTextArea.myGetHandleKeyTyped().myHandleFindStr( cmd.substring(1), super.getCaretPosition() );
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": cmd= " + cmd );
+//
+    if ( cmd.charAt(0) == '/' && cmd.length() > 1 ) this.myTextArea.myGetHandleKeyTyped().myHandleFindStr( cmd.substring(1), this.myTextArea.getCaretPosition(), true );
     else if ( cmd.equals("w") )  myHandle03CmdLnInputHandleWriteAndExit( SwingMyEditorConst.MY_WRITE_AND_EXIT.w );
     else if ( cmd.equals("q") )  myHandle03CmdLnInputHandleWriteAndExit( SwingMyEditorConst.MY_WRITE_AND_EXIT.q );
     else if ( cmd.equals("wq") ) myHandle03CmdLnInputHandleWriteAndExit( SwingMyEditorConst.MY_WRITE_AND_EXIT.wq );
@@ -138,12 +146,13 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
  */
   private final void myHandle03CmdLnInputHandleWriteAndExit( SwingMyEditorConst.MY_WRITE_AND_EXIT cmd )
   {
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": cmd= " + cmd );
+//
     boolean hasChanged = this.myTextArea.myGetHasChanged();
 // Do: 'w'
     if ( cmd == SwingMyEditorConst.MY_WRITE_AND_EXIT.w && hasChanged ) {
       try {
         this.myTextArea.mySaveFile();
-        this.myTextArea.myCloseWindow();
       }
       catch (Exception e) { this.myMsgLine.mySetMsg( "could not save file" + ": exc= " + e.getMessage() ); }
     } //End: if ( justWrite )
@@ -162,7 +171,9 @@ final class SwingMyEditorZ08CmdLine extends JTextField {
         }
         catch (Exception e) { this.myMsgLine.mySetMsg( "could not save file" + ": exc= " + e.getMessage() ); }
       }
-      else this.myTextArea.myCloseWindow();
+      else {
+        this.myTextArea.myCloseWindow();
+      }
     }
 // Do: 'q!'
     else if ( cmd == SwingMyEditorConst.MY_WRITE_AND_EXIT.forceQ ) {

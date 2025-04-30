@@ -26,6 +26,8 @@ package my_proj.my_lib.lib_swing_editor;
 
 import java.util.ArrayList;
 
+import my_proj.my_lib.lib.MyTrace;
+
 
 //--------------------------------------------------------------------
 //------------------  CLASS: SwingMyEditorZ08HandleKeyTyped  -------------------
@@ -63,6 +65,8 @@ final class SwingMyEditorZ10HandleKeyTyped {
 /**
  * This is the constructor method.
  *
+ * @param textArea  ?
+ * @param msgLine  ?
  */
   SwingMyEditorZ10HandleKeyTyped ( SwingMyEditorZ07TextArea textArea, SwingMyEditorZ09MsgLine msgLine )
   {
@@ -77,20 +81,22 @@ final class SwingMyEditorZ10HandleKeyTyped {
  * This method is the entry into handling most keys typed into the text area in the command mode.
  *
  * @param keyChar  ?
- *
  */
-  final void myHandleCommandKey( char keyChar )
+  final void myHandleCommandKey( char keyChar, boolean canWrite )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + "key= " + keyChar);
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + "key= " + keyChar );
 //Move cursor
     if ( keyChar == 'j' || keyChar == 'k' || keyChar == 'h' || keyChar == 'l' ) this.myHandleCommandKey_h_j_k_l(keyChar);
 //Delete char
-    else if ( keyChar == 'x' ) this.myHandleCommandKey_x();
+    else if ( keyChar == 'x' ) if ( canWrite ) this.myHandleCommandKey_x();
 //Find next string
-    else if ( keyChar == 'n' ) this.myHandleCommandKey_n();
+    else if ( keyChar == 'n' ) this.myHandleCommandKey_n(true);
+    else if ( keyChar == 'N' ) this.myHandleCommandKey_n(false);
 // Put back yanked stuff
-    else if ( keyChar == 'p' ) this.myHandleCommandKey_p();
+    else if ( keyChar == 'p' ) if ( canWrite ) this.myHandleCommandKey_p();
 //Handle multiple key commands
-    else this.myHandleCommandKey_multiple( keyChar );
+    else this.myHandleCommandKey_multiple( keyChar, canWrite );
   } //End: Method
 
 
@@ -101,8 +107,9 @@ final class SwingMyEditorZ10HandleKeyTyped {
  * @param keyChar  ?
  *
  */
-  private final void myHandleCommandKey_multiple ( char keyChar )
+  private final void myHandleCommandKey_multiple ( char keyChar, boolean canWrite )
   {
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + "key= " + keyChar );
 // Add character to command string buffer
     if ( this.myCmdStrBuf == null ) this.myCmdStrBuf = new StringBuffer();
     this.myCmdStrBuf.append(keyChar);
@@ -111,6 +118,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
       String cmdStr = this.myCmdStrBuf.toString();
 // Fragment command
       ArrayList<String> frags = SwingMyEditorZ11Misc.myStringParser(cmdStr, "/,", true);
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + "key= " + keyChar + ": sb= " + this.myCmdStrBuf.toString() + ": frags= " + SwingMyEditorZ11Misc.myArrayListToString(frags));
 // Decide if first word is an integer
       char ch00 = frags.get(0).charAt(0);
       int firstInt = ch00 >= '0' && ch00 <= '9' ? Integer.parseInt(frags.get(0)) : 1;
@@ -119,7 +127,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
 //
       if ( ( frags.size() == 1 && frags.get(0).equals("dd") ) ||
            ( frags.size() == 2 && firstInt > 0 && frags.get(1).equals("dd") ) )
-                         myHandleCommandKey_yy(firstInt, true);
+                         if ( canWrite ) myHandleCommandKey_yy(firstInt, true);
       else if ( ( frags.size() == 1 && frags.get(0).equals("yy") ) ||
                 ( frags.size() == 2 && firstInt > 0 && frags.get(1).equals("yy") ) )
                         myHandleCommandKey_yy(firstInt, false);
@@ -140,8 +148,8 @@ final class SwingMyEditorZ10HandleKeyTyped {
 /**
  * This method ?
  *
- * @param keyChar  ?
- *
+ * @param numbLines  ?
+ * @param doDelete  ?
  */
   private final void myHandleCommandKey_yy ( int numbLines, boolean doDelete )
   {
@@ -172,7 +180,6 @@ final class SwingMyEditorZ10HandleKeyTyped {
  * This method ?
  *
  * @param keyChar  ?
- *
  */
   private final void myHandleCommandKey_h_j_k_l ( char keyChar )
   {
@@ -217,15 +224,28 @@ final class SwingMyEditorZ10HandleKeyTyped {
  * This method finds a string. It can be called from the command line or from the 'n' key.
  *
  * @param strToShiftTo  ?
- * @param strtIndx  ?
  */
-  final void myHandleFindStr( String strToShiftTo, int strtIndx )
+  final void myHandleFindStr( String strToShiftTo, int startIndx, boolean goForward )
   {
     String txt =  this.myTextArea.getText();
-    int indxOfStr = txt.indexOf(strToShiftTo, strtIndx);
-    if ( indxOfStr < 0 ) indxOfStr = txt.indexOf(strToShiftTo, 0);
-    if ( indxOfStr >= 0 ) this.myTextArea.setCaretPosition( indxOfStr );
-    this.myTextToFind = strToShiftTo;
+    int indxOfStr = -1;
+//
+    if ( goForward ) {
+      indxOfStr = txt.indexOf(strToShiftTo, startIndx + 1);
+      if ( indxOfStr < 0 ) indxOfStr = txt.indexOf(strToShiftTo, 0);
+    }
+//
+    else {
+      indxOfStr = txt.lastIndexOf(strToShiftTo, startIndx - 1);
+      if  ( indxOfStr < 0 ) indxOfStr = txt.lastIndexOf(strToShiftTo, txt.length()-1);
+    }
+//
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": fwrd= " + goForward + ": str= " + strToShiftTo + ": caretIndx= " + startIndx + ": newIndx= " + indxOfStr );
+    if ( indxOfStr >= 0 ) {
+      this.myTextArea.setCaretPosition( indxOfStr );
+      this.myTextToFind = strToShiftTo;
+    }
+    else this.myMsgLine.mySetMsg( "could not find text = " + strToShiftTo );
   } //End: Method
 
 
@@ -234,16 +254,13 @@ final class SwingMyEditorZ10HandleKeyTyped {
  * This method ?
  *
  */
-  private final void myHandleCommandKey_n()
+  private final void myHandleCommandKey_n( boolean goForward )
   {
     if ( this.myTextToFind != null ) {
-// Check if need to move search start index
-     String txt = this.myTextArea.getText();
      int pos = this.myTextArea.getCaretPosition();
-     if ( txt.substring(pos).startsWith(this.myTextToFind) ) pos++;
-// Set new position
-     this.myHandleFindStr( this.myTextToFind, pos );
+     this.myHandleFindStr( this.myTextToFind, pos, goForward );
     }
+    else this.myMsgLine.mySetMsg( "no text specified" );
   } //End: Method
 
 
@@ -294,6 +311,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
 /**
  * This method returns the previous new line char relative to the pointer or -1
  *
+ * @param txt  ?
  * @param ptr Starting position in text
  * 
  * @return Returns previous new line char position or -1

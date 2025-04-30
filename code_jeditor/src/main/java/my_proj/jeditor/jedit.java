@@ -1,8 +1,9 @@
 // jedit.java
 /*
- * Copyright (C) 2023 James Everitt
+ * Copyright (C) 2023, 2025 James Everitt
  *
  * This file is part of a Swing based vi like text editor.
+ * It just calls the JFrame based editor in the library directory.
  * 
  * This is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
@@ -24,9 +25,7 @@ package my_proj.jeditor;
 
 //------------------  Import statements  ------------------
 
-import my_proj.my_lib.lib_swing_editor.SwingMyEditorConst;
-import my_proj.my_lib.lib_swing_editor.SwingMyEditorZ03Handler;
-
+import my_proj.my_lib.lib_swing_editor.SwingMyEditorJFrame;
 
 
 //-----------------------------------------------------------
@@ -34,41 +33,37 @@ import my_proj.my_lib.lib_swing_editor.SwingMyEditorZ03Handler;
 //-----------------------------------------------------------
 /**
  * This class runs the text editor.
- * <pre>
- *   Note to me: for my test use config:
- *     -file /home/jeveritt/mine/programs/java/my_java_code/jeditor/code_jeditor/src/data/jeditor_data/just_a_random_text_file.txt
- * </pre>
- * <p>
+ * It just calls the JFrame based editor in the library directory.
+ * I stuck it here so it's easy to find.
+ * 
  * @author James Everitt
  */
 public final class jedit {
+  
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor
+ * 
+ */
+  private jedit ( ) {}
 
 
 // ------------------ Main Method ------------------
 /**
  * This method is the runnable main method.
  * 
- * @param args String[] of input arguments that are ignored
+ * @param args String[] of input arguments
  */
   public static void main( String[] args )
   {
-    if ( args.length == 1 &&
-         ( args[0].equals("-h")    || args[0].equals("--h") ||
-           args[0].equals("-help") || args[0].equals("--help") ) )
-    {
-      String name = jedit.class.getName();
-      SwingMyEditorZ03Handler.myPrintHelp(name);
-    }
-    else {
-      if ( args.length == 0 ) args = new String[] {
-          SwingMyEditorConst.ARG_ALLOW_FILE_OPS,
-          SwingMyEditorConst.ARG_ALLOW_READ_WRITE,
-          SwingMyEditorConst.ARG_TITLE, "Editor Test"
-          };
-      SwingMyEditorZ03Handler.myInitialize(args, false);
-    }
+    new SwingMyEditorJFrame(args);
   } //End: Method
-
 
 } //End: class jedit
 

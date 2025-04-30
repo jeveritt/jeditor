@@ -57,7 +57,7 @@ public final class MyTrace {
   private static       int                myMaxStackDepthReached = 0;
 
 /** Threshold interest level. Higher level prints more info */
-  private static       int                myThresholdInterestLevel = 0;
+//  private static       int                myThresholdInterestLevel = 0;
   
   private static       long               myLastTimeInMs = -1;
   
@@ -71,6 +71,20 @@ public final class MyTrace {
   
   private static       boolean            myDoIndent = true;
   private static       boolean            myAddPrefixAndIndentDots = true;
+
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private MyTrace ( ) {}
+
 
 //----------------------------------------------------------
 //------------------  Static Methods  ----------------------
@@ -108,7 +122,7 @@ public final class MyTrace {
  *
  */
 //static int setCnt=0;
-  synchronized public static final void mySetVerboseLevel ( int verboseInfoLevel, String outputFile, boolean myResetStackReferenceLevel )
+  synchronized public static final void mySetVerboseLevel ( int verboseInfoLevel, String outputFile, boolean resetStackReferenceLevel )
   {
 //System.out.println("\n---xxx---\n" + MyTrace.myGetMethodName() + ": cnt= " + ++setCnt + ": newLvl= " + verboseInfoLevel + ": file= " + outputFile);
 //if(setCnt==3)throw new Error(MyTrace.myGetMethodName() + ": force error");
@@ -129,7 +143,7 @@ public final class MyTrace {
 //         myResetStackReferenceLevel = false;
 //         myStackStartLevelForOffset = myStackPresentLevel;
 //       }
-      if ( myResetStackReferenceLevel ) myStackStartLevelForOffset = Thread.currentThread().getStackTrace().length;
+      if ( resetStackReferenceLevel ) myStackStartLevelForOffset = Thread.currentThread().getStackTrace().length;
     }
     else if ( verboseInfoLevel == 0 ) {
       MyTrace.myClose();
@@ -157,7 +171,6 @@ public final class MyTrace {
  * This static method allows or suppresses indents. Suppressing indents is used for generating output that can be compared to "C" output.
  *
  * @param doIndent  ?
- *
  */
   public static final void mySetDoIndents ( boolean doIndent ) { MyTrace.myDoIndent = doIndent; }
 
@@ -166,8 +179,7 @@ public final class MyTrace {
 /**
  * This static method 
  *
- * @param doIndent  ?
- *
+ * @param prefAndDots  ?
  */
   public static final void mySetMyAddPrefixAndIndentDots ( boolean prefAndDots ) { MyTrace.myAddPrefixAndIndentDots = prefAndDots; }
 
@@ -232,7 +244,7 @@ public final class MyTrace {
     MyTrace.myStackPresentLevel = 0;
     MyTrace.myStackStartLevelForOffset = 0;
     MyTrace.myMaxStackDepthReached = 0;
-    MyTrace.myThresholdInterestLevel = 0;
+//    MyTrace.myThresholdInterestLevel = 0;
     MyTrace.myLastTimeInMs = -1;
     MyTrace.myThreadsAndCounts = null;
   } //End: Method
@@ -248,16 +260,6 @@ public final class MyTrace {
   synchronized public static final boolean myDoPrint( )
   { return ( MyTrace.myVerboseInfoLevel < 1 ) ? false : MyTrace.myDoPrintSub(); }
 
-
-//------------------  Method  ------------------
-/**
- * This static method is obsolete.
- *
- * @return  ?
- *
- */
-  synchronized public static final boolean myDoPrint( int disinterestLevel )
-  { return ( MyTrace.myVerboseInfoLevel < 1 || disinterestLevel > MyTrace.myThresholdInterestLevel ) ? false : MyTrace.myDoPrintSub(); }
 
 
 //------------------  Method  ------------------
@@ -579,6 +581,15 @@ public final class MyTrace {
  * @return  ?
  */
   public static final String myInd ( ) { return MyTrace.myIndSub1( false ); }
+
+
+//------------------  Method  ------------------
+/**
+ * This method provides just an indent
+ *
+ * @return  ?
+ */
+  public static final String myIndWithoutPrefix ( ) { return MyTrace.myIndSub1( true ); }
 
 
 //------------------  Method  ------------------

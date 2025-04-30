@@ -21,11 +21,12 @@ import javax.swing.*;
  *
  * @author James Everitt
  */
-public class SwingMyJDialogForPassword extends JDialog {
+public class SwingMyJDialogForPassword {
 
   static final long serialVersionUID = 0;
   
   private   JPasswordField myPasswordField = null;
+  
 
 //------------------------------------------------------------------------
 //--------------------------  Static Methods:  ---------------------------
@@ -42,8 +43,8 @@ public class SwingMyJDialogForPassword extends JDialog {
  */
   public static final String myGetPassword ( Window parentFrame )
   {
-    SwingMyJDialogForPassword pwd = new SwingMyJDialogForPassword ( parentFrame );
-    char[] password = pwd.myPasswordField.getPassword();
+    SwingMyJDialogForPassword pwdDlg = new SwingMyJDialogForPassword ( parentFrame );
+    char[] password = pwdDlg.myPasswordField.getPassword();
     return String.valueOf(password);
   } //End: Method
 
@@ -55,25 +56,43 @@ public class SwingMyJDialogForPassword extends JDialog {
 
 //------------------  Method  ------------------
 /**
- * This is the constructor method.
+ * This is the constructor method using a JDialog.
  *
  * @param parentFrame  Parent frame for dialog
  */
   private SwingMyJDialogForPassword ( Window parentFrame )
   {
-    super ( parentFrame );
-//
-    this.setTitle("Password");
-// Horizontal bar containing everything
-    this.getContentPane().setLayout( new FlowLayout() );
+    JDialog dlg = new JDialog( parentFrame );
+    dlg.setTitle("Password");
+    dlg.setContentPane( this.myGetDialogPanel(dlg) );
+ // Pack and center
+    dlg.pack();
+    dlg.setLocationRelativeTo(parentFrame);
+// Lock out other stuff until password is entered
+    dlg.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+// Set visible
+    dlg.setVisible(true);
+  } //End: Method
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor method.
+ *
+ * @param parentFrame  Parent frame for dialog
+ */
+  private final JPanel myGetDialogPanel ( Window window )
+  {
+    JPanel panel = new JPanel();
+    panel.setLayout( new FlowLayout() );
 // Password text field
     this.myPasswordField = new JPasswordField(16);
     this.myPasswordField.setText("");
-    this.getContentPane().add(this.myPasswordField);
+    panel.add(this.myPasswordField);
 // Handle hitting return to set password
     KeyListener listener = new KeyListener() {
       @Override  public void keyTyped(KeyEvent e) {
-        if ( e.getKeyChar() == KeyEvent.VK_ENTER ) { SwingMyJDialogForPassword.this.dispose(); }
+        if ( e.getKeyChar() == KeyEvent.VK_ENTER ) { window.dispose(); }
       }
 //
       @Override public void keyPressed(KeyEvent e) {}
@@ -83,26 +102,23 @@ public class SwingMyJDialogForPassword extends JDialog {
 // Accept button
     AbstractAction accept = new AbstractAction("Accept") {
       private static final long serialVersionUID = 1L;
-      @Override public void actionPerformed(ActionEvent e) { SwingMyJDialogForPassword.this.dispose(); }
+      @Override public void actionPerformed(ActionEvent e) {
+        window.dispose();
+      }
     };
-    this.getContentPane().add( new JButton(accept) );
+    panel.add( new JButton(accept) );
 // Cancel button
     AbstractAction cancel = new AbstractAction("Cancel") {
       private static final long serialVersionUID = 1L;
       @Override public void actionPerformed(ActionEvent e) {
         SwingMyJDialogForPassword.this.myPasswordField.setText("");
-        SwingMyJDialogForPassword.this.dispose();
+        window.dispose();
       }
     };
 //
-    this.getContentPane().add( new JButton(cancel) );
-// Pack and center
-    this.pack();
-    this.setLocationRelativeTo(parentFrame);
-// Lock out other stuff until password is entered
-    this.setModalityType(ModalityType.APPLICATION_MODAL);
-// Set visible
-    this.setVisible(true);
+    panel.add( new JButton(cancel) );
+//
+    return panel;
   } //End: Method
 
 
@@ -119,14 +135,18 @@ public class SwingMyJDialogForPassword extends JDialog {
     JFrame mainFrame = new JFrame ( "Test SwingMyJDialogForPassword" );
     mainFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     mainFrame.setMinimumSize(new Dimension(300,150));
-//    MyCenterFrame.myCenterFrameOnScreen(mainFrame);
 // Create button to activate password dialog
     AbstractAction getPassword = new AbstractAction("Password") {
       private static final long serialVersionUID = 1L;
 //
       @Override public void actionPerformed(ActionEvent e) {
-        String password = SwingMyJDialogForPassword.myGetPassword(mainFrame);
-        System.out.println("SwingMyJDialogForPassword.main" + ": password= <" + password +">");
+        try {
+          String password = SwingMyJDialogForPassword.myGetPassword(mainFrame);
+          System.out.println("SwingMyJDialogForPassword.main" + ": password= <" + password +">");
+        }
+        catch (Exception exc ) {
+          exc.printStackTrace();
+        }
       }
     };
 //

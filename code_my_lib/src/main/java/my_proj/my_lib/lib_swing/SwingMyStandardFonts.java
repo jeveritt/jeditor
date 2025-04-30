@@ -54,36 +54,56 @@ public final class SwingMyStandardFonts
 /** This is the base font size for all buttons, labels, menus, etc. and can be interactively scaled to enlarge or shrink text. */
   private static int MY_DEFAULT_FONT_SIZE = SwingMyStandardFonts.MY_FIXED_STANDARD_STARTING_FONT_SIZE;
 //
-// Font types I'll support
 //  Note: Monospaced font type and bold style is not monospaced for all characters - go figure
 //
-  public static enum MY_FONTS { Monospaced, Dialog}
+/** Enum of supported font type */
+  public static enum MY_FONTS {
+/** Mono spaced font */
+    Monospaced,
+/** Dialog font */
+    Dialog
+    }
 //
-// Mono Fonts
-//
+/** Mono Fonts */
   private static final ArrayList<Font> MY_FONTS_MONOSPACED = new ArrayList<>();
 //
-// Fancy Fonts
-//
+/** Fancy Fonts */
   private static final ArrayList<Font> MY_FONTS_DIALOG = new ArrayList<>();
 //
 // Standard Fonts
 //
+/** Default general font */
   private static Font MY_DFLT_GENERAL_FONT = SwingMyStandardFonts.myGetMonospacedFont(SwingMyStandardFonts.MY_FIXED_STANDARD_STARTING_FONT_SIZE);
+/** Default button font */
   private static Font MY_DFLT_BUTTON_FONT = SwingMyStandardFonts.myGetMonospacedFont(SwingMyStandardFonts.MY_FIXED_STANDARD_STARTING_FONT_SIZE);
+/** Default border font */
   public  static Font MY_BORDER_FONT  = SwingMyStandardFonts.myGetMonospacedFont(SwingMyStandardFonts.MY_FIXED_STANDARD_STARTING_FONT_SIZE);
 //
-// Margins for buttons
-//
+/** Margins for buttons */
   public static final Insets myButtonMargins = new Insets(0,0,0,0);
 //
+/** Default bold size */
   private static final int TO_BOLD_SIZE = 10;
+
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private SwingMyStandardFonts ( ) {}
+
 
 //-----------------------------------------------------------
 //------------------  Static Methods:  ----------------------
 //-----------------------------------------------------------
 
-  
+
 //------------------  Method  ------------------
 /**
  * This static method gets a font name from a font enum
@@ -373,8 +393,11 @@ public final class SwingMyStandardFonts
 /**
  * This static method ?
  *
- * @return  ?
+ * @param str  ?
+ * @param fontType  ?
+ * @param fontSize  ?
  *
+ * @return  ?
  */
   public static int[] myGetStringSize( String str, MY_FONTS fontType, int fontSize )
   {
@@ -439,7 +462,6 @@ public final class SwingMyStandardFonts
 //----------------------------------------------------------------------------------------------------------------------------
 /**
 * This class tests the SwingMyStandardFonts class.
-* <p>
 * @author James Everitt
 */
 final class zzTestSwingMyStandardFonts extends JPanel  {

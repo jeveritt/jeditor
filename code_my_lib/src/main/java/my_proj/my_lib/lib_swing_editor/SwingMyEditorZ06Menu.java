@@ -39,7 +39,20 @@ import javax.swing.JPopupMenu;
  * @author James Everitt
  */
 public final class SwingMyEditorZ06Menu {
-  
+
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private SwingMyEditorZ06Menu ( ) {}
+
 
 //------------------------------------------------------------------------
 //--------------------------  Static Methods:  ---------------------------
@@ -50,10 +63,12 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
+ * @param actions   SwingMyEditorZ05Action actions to be performed
+ * 
+ * @return  Returns a JMenu instance
  */
-  static final JMenu myCreateZ01MenuFile ( SwingMyEditorZ05Action actions )
+  private static final JMenu myCreateZ01MenuFile ( SwingMyEditorZ05Action actions )
   {
-//
     JMenu subMenu = new JMenu ("File");
 //
     subMenu.add( actions.MY_FILE_OPEN_UNENCRYPTED );
@@ -72,7 +87,6 @@ public final class SwingMyEditorZ06Menu {
     subMenu.add( actions.MY_FILE_CLOSE_WINDOW );
 //
     return subMenu;
-//
   } //End: Method
 
 
@@ -80,13 +94,15 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
+ * @param actions   SwingMyEditorZ05Action actions to be performed
+ * 
+ * @return  Returns a JMenu instance
  */
-  static final JMenu myCreateZ02MenuEdit ( SwingMyEditorZ05Action actions )
+  private static final JMenu myCreateZ02MenuEdit ( SwingMyEditorZ05Action actions )
   {
-//
     JMenu subMenu = new JMenu ("Edit");
 //
-    subMenu.add( actions.MY_EDIT_COPY );
+//    subMenu.add( actions.MY_EDIT_COPY );
 //
     return subMenu;
   } //End: Method
@@ -96,13 +112,19 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
+ * @param actions   SwingMyEditorZ05Action actions to be performed
+ * 
+ * @return  Returns a JMenu instance
  */
-  static final JMenu myCreateZ04MenuHelp ( SwingMyEditorZ05Action actions )
+  private static final JMenu myCreateZ04MenuHelp ( SwingMyEditorZ05Action actions )
   {
-//
     JMenu subMenu = new JMenu ("Help");
 //
-    subMenu.add( actions.MY_HELP_ABOUT );
+    subMenu.add( actions.MY_HELP_ABOUT_RUN );
+    if ( SwingMyEditorConst.myType == SwingMyEditorConst.MY_TYPE.FRAME ) subMenu.add( actions.MY_HELP_ABOUT_OPEN );
+    subMenu.addSeparator();
+    subMenu.add( actions.MY_HELP_INFO );
+    subMenu.addSeparator();
     subMenu.add( actions.MY_HELP_COPYRIGHT );
 //
     return subMenu;
@@ -113,11 +135,11 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
+ * @param actions   SwingMyEditorZ05Action actions to be performed
  */
-  static final void myCreateZ08Initialize
+  private static final void myCreateZ08Initialize
   ( JComponent menu, JMenu[] custom, SwingMyEditorZ05Action actions )
   {
-//
     JPopupMenu popup = (menu instanceof JPopupMenu) ? (JPopupMenu)menu : null;
 //
 //--- File menu stuff --------
@@ -147,6 +169,10 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
+ * @param custom  JMenu[] custom menus to be filled in
+ * @param actions   SwingMyEditorZ05Action actions to be performed
+ * 
+ * @return  returns a JPopupMenu
  */
   static final JPopupMenu myCreatePopupMenu ( JMenu[] custom, SwingMyEditorZ05Action actions )
   {
@@ -162,10 +188,10 @@ public final class SwingMyEditorZ06Menu {
 /**
  * This static method ?
  *
- * @param custom  ?
- * @param actions  ?
- *
- * @return  ?
+ * @param custom  JMenu[] custom menus to be filled in
+ * @param actions   SwingMyEditorZ05Action actions to be performed
+ * 
+ * @return  returns a JMenuBar
  */
   public static final JMenuBar myCreateMenuBar ( JMenu[] custom, SwingMyEditorZ05Action actions )
   {

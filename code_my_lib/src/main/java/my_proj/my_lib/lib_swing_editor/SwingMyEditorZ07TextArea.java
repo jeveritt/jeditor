@@ -24,6 +24,7 @@ package my_proj.my_lib.lib_swing_editor;
 
 //------------------  Import statements  ------------------
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Insets;
@@ -47,6 +48,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
+import javax.swing.text.JTextComponent;
 import javax.swing.undo.UndoManager;
 
 import my_proj.my_lib.lib.MyTrace;
@@ -66,35 +68,53 @@ import my_proj.my_lib.lib_swing.SwingMyStandardFonts;
  */
 public final class SwingMyEditorZ07TextArea extends JTextArea {
   
-//  private static final boolean         DO_TRACE = true;
-  
-          static enum MY_MODES { COMMAND, INSERT }
+//private static final boolean         DO_TRACE = true;
 
-  private static final long            serialVersionUID = 0;
+/** Serial UID */
+  private static final long serialVersionUID = -7941194344589361384L;
+
+/** Enum list of edit modes */
+          static enum MY_MODES { cmd, ins }
+
+/** Edit mode */
+  private MY_MODES                     myCurrentMode = MY_MODES.ins;
   
-  private MY_MODES                     myCurrentMode = MY_MODES.INSERT;
-  
+/** Setup control int */
+  private int                          myCtrl = 0;
+ 
+/** Saved data file */
   private File                         mySavedDataFile = null;
   
+/** Boolean indicating if text has changed */
   private boolean                      myChanged = false;
   
+/** Boolean indicating if a file save was done */
   private boolean                      myDidFileSave = false;
   
+/** Boolean indicating if saving files is allowed */
   private boolean                      myAllowFileSave = false;
+/** Boolean indicating if saving encrypted files is allowed */
   private boolean                      myAllowFileSaveAsEncrypted = false;
   
+/** List of actions */
   private SwingMyEditorZ05Action       myActions = null;
   
+/** Password String */
   private String                       myPassword;
   
+/** Working directory name */
   private String                       myWorkingDirName = null;
   
+/** Command line panel */
   private SwingMyEditorZ08CmdLine      myCmdLine = null;
   
+/** Message line panel */
   private SwingMyEditorZ09MsgLine      myMsgLine = null;
   
+/** Method handling keys that were typed */
   private SwingMyEditorZ10HandleKeyTyped myHandleKeyCmdTypedHandler = null;
   
+/** Undo manager */
   private UndoManager                  myUndoManager = null;
 
 
@@ -112,7 +132,9 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This constructor method ?
  *
- * @param dataAsBufLine  ?
+ * @param textDataAsString  ?
+ * @param cmdLine  ?
+ * @param msgLine  ?
  * @param ctrl  ?
  * @param password  ?
  * @param saveDataFile  ?
@@ -121,40 +143,60 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  * @throws Exception  Java standard exception
  */
   public SwingMyEditorZ07TextArea (
-      String    textDataAsString,
-      int       ctrl,
-      String    password,
-      File      saveDataFile,
-      String    workingDirName
+      String                  textDataAsString,
+      SwingMyEditorZ08CmdLine cmdLine,
+      SwingMyEditorZ09MsgLine msgLine,
+      int                     ctrl,
+      String                  password,
+      File                    saveDataFile,
+      String                  workingDirName
 //,int dummy
   ) throws Exception
   {
     super(textDataAsString);
 //
+//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": ctrl= 0x" + Integer.toHexString(ctrl));
+//
+    this.myCmdLine = cmdLine;
+    this.myMsgLine = msgLine;
+    this.myCtrl = ctrl;
+    this.myHandleKeyCmdTypedHandler = new SwingMyEditorZ10HandleKeyTyped(this, this.myMsgLine);
+//
 // Might want to prevent saving back encrypted files as plain text
-    this.myAllowFileSave = (ctrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0;
-    this.myAllowFileSaveAsEncrypted = (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0;
+    this.myAllowFileSave = (this.myCtrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0;
+    this.myAllowFileSaveAsEncrypted = (this.myCtrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0;
 //
     this.myChanged = false;
     this.myDidFileSave = false;
     this.myPassword = password;
     this.myWorkingDirName = workingDirName;
+    this.myMsgLine.mySetWritable(this.myAllowWrite());
 //
     this.mySavedDataFile = saveDataFile;
+// If can't write then force into cmd mode
+    boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+    if ( !canWrite ) this.mySetMode(MY_MODES.cmd);
+    else this.mySetMode(MY_MODES.ins);
 //
     super.setFont(SwingMyEditorConst.MY_FONT);
 //
     super.setMargin( new Insets(2,6,2,6) );  // top, left, bottom, right
 //
-    super.setEditable( (ctrl & SwingMyEditorConst.MY_ALLOW_FILE_OPS) != 0 );
+    super.setCaretColor(Color.red);
+//
     super.addKeyListener(
         new KeyListener() {
-          @Override public void keyTyped(KeyEvent e) { SwingMyEditorZ07TextArea.this.myHandleKeyTyped(e); }
-          @Override public void keyPressed(KeyEvent e) { }
-          @Override public void keyReleased(KeyEvent e)
-          { if( SwingMyEditorZ07TextArea.this.myCurrentMode == MY_MODES.COMMAND ) SwingMyEditorZ07TextArea.this.myHandleKeyReleasedInCommandMode(e); }
+          @Override public void keyTyped(KeyEvent e) {
+            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+            SwingMyEditorZ07TextArea.this.myHandleKeyTyped(e, canWrite);
           }
-        );
+          @Override public void keyPressed(KeyEvent e) { }
+          @Override public void keyReleased(KeyEvent e) {
+            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+            if( SwingMyEditorZ07TextArea.this.myCurrentMode == MY_MODES.cmd ) SwingMyEditorZ07TextArea.this.myHandleKeyReleasedInCommandMode(e, canWrite);
+          }
+        }
+    );
 //
     super.setFont(SwingMyStandardFonts.myGetStandardMonospacedFont());
 //
@@ -165,16 +207,16 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
           @Override public void mouseExited   (MouseEvent e) { }
           @Override public void mousePressed  (MouseEvent e) { if (e.isPopupTrigger()) SwingMyEditorZ07TextArea.this.myHandlePopup(e); }
           @Override public void mouseReleased (MouseEvent e) { if (e.isPopupTrigger()) SwingMyEditorZ07TextArea.this.myHandlePopup(e); }
-          }
-        );
+        }
+    );
 //
     this.myActions = new SwingMyEditorZ05Action( ctrl, this );
 //
 // Add undo manager
     this.myUndoManager = new UndoManager();
     this.getDocument().addUndoableEditListener(this.myUndoManager);
-// Maybe set carot invisible
-    if ( (ctrl & SwingMyEditorConst.MY_ALLOW_FILE_OPS) == 0 ) super.getCaret().setVisible(false);
+//
+//    if ( DO_TRACE ) System.out.print(this.myGetInfoString(" ", "Program state at end of constructor", null));
   } //End: Method
 
 
@@ -182,24 +224,22 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @return  ?
- *
+ * @param e  ?
  */
-  private final void myHandleKeyTyped (KeyEvent e)
+  private final void myHandleKeyTyped (KeyEvent e, boolean canWrite)
   {
 //if(DO_TRACE) System.out.println(MyTrace.myGetMethodName() + ": keyEvent= " + e);
-    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": editable= " + this.isEditable() + ": mode= " + this.myCurrentMode + ": keyEvent= " + e.getKeyChar() );
+//
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": editable= " + this.isEditable() + ": mode= " + this.myCurrentMode + ": keyEvent= <" + e.getKeyChar() + ">" );
+// non-editable mode seems to turn off caret by default
+    this.getCaret().setVisible(true);
 //
     this.myMsgLine.mySetMsg(null);
     char keyChar = e.getKeyChar();
 // If escape key typed go to command mode
-    if ( keyChar == KeyEvent.VK_ESCAPE ) {
-      this.myCurrentMode = MY_MODES.COMMAND;
-      this.myMsgLine.mySetMode(MY_MODES.COMMAND);
-      super.setEditable(false);
-    }
+    if ( keyChar == KeyEvent.VK_ESCAPE ) this.mySetMode(MY_MODES.cmd);
 // Else if already in command mode, handle command key
-    else if ( this.myCurrentMode == MY_MODES.COMMAND ) this.myHandleKeyTypedInCommandMode ( keyChar );
+    else if ( this.myCurrentMode == MY_MODES.cmd ) this.myHandleKeyTypedInCommandMode ( keyChar, canWrite );
 // Else in insert mode and need to acknowledge that key was typed
     else this.myChanged = true;
   } //End: Method
@@ -212,17 +252,17 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  *
  * @param keyChar  Key that was typed
  */
-  private final void myHandleKeyTypedInCommandMode ( char keyChar )
+  private final void myHandleKeyTypedInCommandMode ( char keyChar, boolean canWrite )
   {
 //if(DO_TRACE) System.out.println(MyTrace.myGetMethodName() + ": keyChar= " + keyChar);
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": editable= " + this.isEditable() + ": mode= " + this.myCurrentMode + ": key= " + keyChar );
 //
 // If go to command line
-    if ( this.myCmdLine != null && keyChar == ':' ) SwingMyEditorZ04JPanel.mySetCaretTo(this.myCmdLine);
+    if ( this.myCmdLine != null && keyChar == ':' ) mySetCaretTo(this.myCmdLine);
 // Else if handle undo
-    else if ( keyChar == 'u' ) { if ( this.myUndoManager.canUndo() ) this.myUndoManager.undo(); }
+    else if ( keyChar == 'u' ) { if ( canWrite && this.myUndoManager.canUndo() ) this.myUndoManager.undo(); }
 // Else if not going back to insert mode go to sub-routine
-    else if ( keyChar != 'i' && keyChar != 'a' ) this.myHandleKeyCmdTypedHandler.myHandleCommandKey( keyChar );
+    else if ( keyChar != 'i' && keyChar != 'a' ) this.myHandleKeyCmdTypedHandler.myHandleCommandKey( keyChar, canWrite );
   } //End: Method
 
   
@@ -233,41 +273,18 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  *
  * @param keyChar  Key that was typed
  */
-  private final void myHandleKeyReleasedInCommandMode (KeyEvent e)
+  private final void myHandleKeyReleasedInCommandMode ( KeyEvent e, boolean canWrite )
   {
 //if(DO_TRACE) System.out.println(MyTrace.myGetMethodName() + ": keyEvent= " + e);
-    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": editable= " + this.isEditable() + ": mode= " + this.myCurrentMode + ": keyEvent= " + e.getKeyChar() );
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": editable= " + this.isEditable() + ": mode= " + this.myCurrentMode + ": keyEvent= <" + e.getKeyChar() + ">" );
 //
     char keyChar = e.getKeyChar();
 // Important to exit command mode here so that 'i' is not typed.
-    if ( keyChar == 'i' || keyChar == 'a' ) {
-      this.myCurrentMode = MY_MODES.INSERT;
-      this.myMsgLine.mySetMode(MY_MODES.INSERT);
-      super.setEditable(true);
-    }
+    if ( keyChar == 'i' || keyChar == 'a' ) if ( canWrite ) this.mySetMode(MY_MODES.ins);
     if ( keyChar == 'a' ) {
-      super.setCaretPosition(super.getCaretPosition()+1);
+        if ( canWrite ) super.setCaretPosition(super.getCaretPosition()+1);
     }
   } //End: Method
-
-//------------------  Method  ------------------
-/**
- * This method ?
- *
- * @return  ?
- *
- */
-  public final boolean myGetHasChanged () { return this.myChanged; }
-  
-
-//------------------  Method  ------------------
-/**
- * This method ?
- *
- * @return  ?
- *
- */
-  public final SwingMyEditorZ10HandleKeyTyped myGetHandleKeyTyped() { return this.myHandleKeyCmdTypedHandler; }
 
 
 //------------------  Method  ------------------
@@ -275,7 +292,6 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  * This method ?
  *
  * @param needToWrite  ?
- *
  */
   final void mySetNeedToWrite( boolean needToWrite ) { this.myChanged = needToWrite; }
 
@@ -283,6 +299,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //------------------  Method  ------------------
 /**
  * This method ?
+ * 
+ * @param isEncrypted  ?
  *
  * @throws Exception  Java standard exception
  */
@@ -292,7 +310,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
 //
-    Window topWind = SwingMyEditorZ11Misc.myGetParentWindow(this);
+    Container topWind = this; // SwingMyEditorZ11Misc.myGetParentWindow(this);
+    while ( topWind.getParent() != null ) topWind = topWind.getParent();
     JFileChooser fileChooser = new JFileChooser(this.myWorkingDirName);
     int chooseInt = fileChooser.showDialog(topWind, "select file to open");
     File newFile = (chooseInt == JFileChooser.APPROVE_OPTION) ? fileChooser.getSelectedFile() : null;
@@ -342,28 +361,71 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  * This method ?
  *
  * @param file  ?
- *
  */
   public final void mySetDataFile( File file ) {
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
 //
     this.mySavedDataFile = file;
-  }
+  } //End: Method
 
 
 //------------------  Method  ------------------
 /**
  * This method ?
  *
- * @param file  ?
+ * @param mode  ?
+ */
+  private final void mySetMode ( MY_MODES mode ) {
+//if(DO_TRACE) System.out.println(MyTrace.myGetMethodName() + ": mode= " + mode);
+//
+    this.myCurrentMode = mode;
+    this.myMsgLine.mySetMode(mode);
+    if ( mode == MY_MODES.ins ) {
+      super.setEditable( this.myAllowWrite() );
+      mySetCaretTo(this);
+    }
+    else {
+      super.setEditable( false );
+    }
+  } //End: Method
+
+
+//------------------  Method  ------------------
+/**
+ * This static method ?
+ *
+ * @param comp  ?
+ */
+  static final void mySetCaretTo ( JTextComponent comp ) { comp.requestFocusInWindow(); comp.getCaret().setVisible(true); }
+
+
+//------------------  Method  ------------------
+/**
+ * This method determines if a file can be written
+ *
+ * @return
+ */
+  private final boolean myAllowWrite( ) {
+    boolean writable = (
+                         (this.myPassword != null && (this.myCtrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0 ) ||
+                         (this.myPassword == null && (this.myCtrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0 )
+                       );
+    return writable;
+  } //End: Method
+
+
+//------------------  Method  ------------------
+/**
+ * This method sets the password
  *
  */
   public final void mySetPassword( )
   {
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
 //
-    Window topWind = SwingMyEditorZ11Misc.myGetParentWindow(this);
-    String password = SwingMyJDialogForPassword.myGetPassword(topWind);
+    Container topWind = this; // SwingMyEditorZ11Misc.myGetParentWindow(this);
+    while ( topWind.getParent() != null ) topWind = topWind.getParent();
+    String password = SwingMyJDialogForPassword.myGetPassword( (Window)topWind );
     if ( password != null && password.length() > 0 ) this.myPassword = password;
   } //End: Method
 
@@ -372,24 +434,15 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @param file  ?
- *
+ * @param msg  ?
  */
   private final void myShowMessage( String msg )
   {
-    Window fr = SwingMyEditorZ11Misc.myGetParentWindow(this);
-    JOptionPane.showMessageDialog(fr, msg);
+    Container fr = this; // SwingMyEditorZ11Misc.myGetParentWindow(this);
+    while ( fr.getParent() != null ) fr = fr.getParent();
+    if ( fr != null && fr.isVisible() ) JOptionPane.showMessageDialog(fr, msg);
+    else System.out.println( MyTrace.myGetMethodName() + ": msg= ");
   } //End: Method
-
-
-//------------------  Method  ------------------
-/**
- * This method ?
- *
- * @return  ?
- *
- */
-  public final File myGetDataFile( ) { return this.mySavedDataFile; }
 
 
 //------------------  Method  ------------------
@@ -414,6 +467,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
+ * @param saveAsEncrypted  ?
+ *
  * @throws Exception  Java standard exception
  */
   final void mySaveFile( boolean saveAsEncrypted ) throws Exception
@@ -434,8 +489,6 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @param saveOld  ?
- *
  * @throws Exception  Java standard exception
  */
   final void mySaveFileAs( ) throws Exception
@@ -445,7 +498,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //
     if ( !this.myAllowFileSave && !this.myAllowFileSaveAsEncrypted ) return;
 //
-    Window topWind = SwingMyEditorZ11Misc.myGetParentWindow(this);
+    Container topWind = this;  // SwingMyEditorZ11Misc.myGetParentWindow(this);
+    while ( topWind.getParent() != null ) topWind = topWind.getParent();
     JFileChooser fileChooser = new JFileChooser(this.myWorkingDirName);
     int chooseInt = fileChooser.showDialog(topWind, "select file to save data in");
     File newFile = (chooseInt == JFileChooser.APPROVE_OPTION) ? fileChooser.getSelectedFile() : null;
@@ -462,8 +516,10 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
+ * @param saveAsEncrypted  ?
  * @param fileName  ?
- * @param saveOld  ?
+ * @param numbOldToSave  ?
+ * @param cameFromSaveFileAs  ?
  *
  * @return  ?
  *
@@ -501,8 +557,9 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //  Handle password
       if ( this.myPassword == null ) this.myPassword = MyWriteOrReadGpgFile.myGetStandardPas();
       if ( this.myPassword == null ) {
-        Window fr = SwingMyEditorZ11Misc.myGetParentWindow(this);
-        this.myPassword = SwingMyJDialogForPassword.myGetPassword(fr);
+        Container fr = this; // SwingMyEditorZ11Misc.myGetParentWindow(this);
+        while ( fr.getParent() != null ) fr = fr.getParent();
+        this.myPassword = SwingMyJDialogForPassword.myGetPassword((Window)fr);
       }
 //  Do write
       MyWriteOrReadGpgFile.myWriteEncryptedFile(
@@ -523,15 +580,17 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @param text  ?
- *
+ * @throws Exception  Java standard exception
  */
   private final void myAskToSaveFileIfNecessary ( ) throws Exception
   {
-    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": hasChanged= " + this.myChanged );
     if ( this.myChanged ) {
-      Window fr = SwingMyEditorZ11Misc.myGetParentWindow(this);
-      int closingArg = JOptionPane.showConfirmDialog(fr, "Save modified file?");
+      Container fr = this;
+      while ( fr.getParent() != null ) fr = fr.getParent();
+      int closingArg;
+      if ( fr != null && fr.isVisible() ) closingArg = JOptionPane.showConfirmDialog(fr, "Save modified file?");
+      else closingArg = JOptionPane.YES_OPTION;
       if ( closingArg == JOptionPane.YES_OPTION ) this.mySaveFile();
     }
   } //End: Method
@@ -588,18 +647,19 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //    if (DO_TRACE) System.out.println(MyTrace.myGetMethodName() + ": fileToSave= " + this.mySavedDataFile );
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
 //
-    Container topContainer = SwingMyEditorZ11Misc.myGetParentWindowOrInternalFrame(this);
+    Container topContainer = this;  // SwingMyEditorZ11Misc.myGetParentWindowOrInternalFrame(this);
+    while ( topContainer.getParent() != null ) topContainer = topContainer.getParent();
 //
     if ( topContainer instanceof Window ) {
       this.myCloseFile();
       Window wind = (Window)topContainer;
-      wind.setVisible(false);
+//      wind.setVisible(false);
       wind.dispose();
     }
     else if ( topContainer instanceof JInternalFrame ) {
       this.myCloseFile();
       JInternalFrame intFr = (JInternalFrame)topContainer;
-      intFr.setVisible(false);
+//      intFr.setVisible(false);
       intFr.dispose();
     }
   } //End: Method
@@ -608,29 +668,28 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //------------------  Method  ------------------
 /**
  * This method ?
- * 
- * @param cmdLine  ?
  *
+ * @return    Returns allowed actions
  */
-  final void mySetCmdAndMsgLines( SwingMyEditorZ08CmdLine cmdLine, SwingMyEditorZ09MsgLine msgLine )
-  {
-    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() );
-//
-    this.myCmdLine = cmdLine;
-    this.myMsgLine = msgLine;
-//
-    this.myHandleKeyCmdTypedHandler = new SwingMyEditorZ10HandleKeyTyped(this, this.myMsgLine);
-  } //End: Method
+  public final SwingMyEditorZ05Action myGetActions () { return this.myActions; }
+
+
+//------------------  Method  ------------------
+/**
+ * This method ?
+ *
+ * @return  ?
+ */
+  public final File myGetDataFile( ) { return this.mySavedDataFile; }
 
 
 //------------------  Method  ------------------
 /**
  * This method ?
  * 
- * @param key  ?
+ * @param reset  ?
  *
  * @return  ?
- *
  */
   public final boolean myGetDidFileSave ( boolean reset )
   {
@@ -645,8 +704,57 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @param e  ?
+ * @return  ?
  *
+ */
+  public final SwingMyEditorZ10HandleKeyTyped myGetHandleKeyTyped() { return this.myHandleKeyCmdTypedHandler; }
+
+
+//------------------  Method  ------------------
+/**
+ * This method ?
+ *
+ * @return  ?
+ *
+ */
+  public final boolean myGetHasChanged () { return this.myChanged; }
+
+
+//------------------  Method  ------------------
+/**
+ * This method returns info about program status.
+ *
+ * @param ind  Amount to indent
+ * @param title  First line title or null
+ * 
+ * @return  Return info string
+ */
+  final String myGetInfoString( String ind, StringBuffer sb )
+  {
+    if ( sb == null ) sb = new StringBuffer();
+//
+    sb.append(ind + this.getClass().getSimpleName() + " info:" + "\n");
+    ind += "  ";
+//
+    sb.append( ind + "mode             = " + this.myCurrentMode + "\n" );
+    sb.append( ind + "file             = " + ( this.mySavedDataFile == null ? "null" : this.mySavedDataFile.getAbsolutePath() ) + "\n" );
+    sb.append( ind + "file changed     = " + this.myChanged + "\n" );
+    sb.append( ind + "did save         = " + this.myDidFileSave + "\n" );
+    sb.append( ind + "allow unenc save = " + this.myAllowFileSave + "\n" );
+    sb.append( ind + "allow enc save   = " + this.myAllowFileSaveAsEncrypted+ "\n" );
+    sb.append( ind + "working dir      = " + this.myWorkingDirName + "\n" );
+    sb.append( ind + "text is editable = " + this.isEditable() + "\n" );
+//    SwingMyEditorConst.myGetEditorConstInfo( this.myCtrl, sb, ind);
+//
+    return sb.toString();
+  } //End: Method
+
+
+//------------------  Method  ------------------
+/**
+ * This method ?
+ *
+ * @param e  ?
  */
   final void myHandlePopup ( MouseEvent e )
   {
@@ -673,11 +781,14 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //
     String val = this.getSelectedText();
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    if ( clipboard != null ) {
+//
+    if ( val == null || val.length() == 0 ) this.myMsgLine.mySetMsg("nothing selected");
+    else if ( clipboard == null ) this.myMsgLine.mySetMsg("system clipboard not available");
+    else {
       StringSelection strSel = new StringSelection(val);
       clipboard.setContents(strSel, strSel);
+      this.myMsgLine.mySetMsg("copied selected to system clipboard");
     } //End: if ()
-//
   } //End: Method
 
 
@@ -686,7 +797,12 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  * This method ?
  *
  */
-  public final SwingMyEditorZ05Action myGetActions () { return this.myActions; }
+//  final void myHandleSetVisible ()
+//  {
+////if(DO_TRACE)System.out.println( "\n" + MyTrace.myGetMethodName() + ": isVisible= " + this.isVisible());
+//
+//    this.mySetMode(MY_MODES.ins);
+//  } //End: Method
 
 
 } //End: class SwingMyEditorZ05TextArea

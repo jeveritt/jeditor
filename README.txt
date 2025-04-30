@@ -52,12 +52,9 @@
       |       |   +-- java
       |       |       +-- my_proj = sort of my company
       |       |           +-- jeditor = holder of top level program
-      |       |               |-- jedit.java
-      |       |               +-- jedit_dialog.java
+      |       |               +-- jedit.java
       |       +-- test
-      |           +-- jeditor_data = files used for testing
-      |               |-- encrypted_file_pw_ABCD.gpg
-      |               +-- just_a_random_text_file.txt
+      |           +-- Nothing here
       +-- code_my_lib = secondary library
           +-- src
               |-- data
@@ -69,6 +66,7 @@
               |           |   |-- lib              = second level grouping
               |           |   |-- lib_encrypt      = second level grouping
               |           |   |   + call_gpg       = third  level grouping
+              |           |   |-- lib_ops          = second level grouping
               |           |   |-- lib_swing        = second level grouping
               |           |   +-- lib_swing_editor = second level grouping
               |           +-- my_lib_resources
@@ -86,12 +84,11 @@
       |-- .gitignore
       |-- LICENSE
       |-- README.txt = this file
-      |-- build
-      |   |-- build.xml = file called by ant to build jeditor.jar
-      |   +-- README.txt
-      |-- doc
-      |   +-- Nothing here
+      |-- java_editor_documentation.zip
       |-- tools = various scripts
+      |   |-- build
+      |   |   |-- build.xml = file called by ant to build jeditor.jar
+      |   |   +-- README.txt
       |   |-- jeditor = Linux script to run jedit
       |   |-- jeditor.cmd = Windows script to run jedit
       |   +-- other scripts

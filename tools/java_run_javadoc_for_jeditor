@@ -1,0 +1,39 @@
+#!/bin/bash
+
+javadocExe="/usr/bin/javadoc"
+
+sourceTopPath=".."
+libSourcePath="${sourceTopPath}/code_my_lib/src/main/java"
+projSourcePath="${sourceTopPath}/code_jeditor/src/main/java"
+
+tmpDir="/tmp"
+docDir="java_editor_documentation"
+outputDir="${tmpDir}/${docDir}"
+
+startingWd=`pwd`
+
+#echo startingWd = ${startingWd}
+
+###################################### ALL
+
+pkgList="\
+   my_proj.my_lib.lib\
+   my_proj.my_lib.lib_encrypt.call_gpg\
+   my_proj.my_lib.lib_ops\
+   my_proj.my_lib.lib_swing\
+   my_proj.my_lib.lib_swing_editor\
+   my_proj.jeditor \
+"
+
+title="Java Editor"
+
+${javadocExe} -sourcepath ${libSourcePath}:${projSourcePath} -d "${outputDir}" -doctitle "${title}" -overview ${libOverviewFile} -author -use -public ${pkgList}
+
+cd ${tmpDir}
+#echo wd = `pwd`
+zip -r "${docDir}" "${docDir}"
+
+mv "${outputDir}.zip" "${startingWd}/../."
+
+echo "Output in: ${outputDir} and ${startingWd}/../${docDir}.zip"
+

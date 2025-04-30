@@ -33,6 +33,9 @@ import java.io.OutputStreamWriter;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 
+import my_proj.my_lib.lib.MyMisc;
+import my_proj.my_lib.lib.MyTrace;
+
 
 //  ----------------  CLASS: MyWriteOrReadGpgFile  ----------------
 /**
@@ -42,9 +45,23 @@ import java.util.ArrayList;
  */
 public class MyWriteOrReadGpgFile  {
 
-//  private static final boolean DO_TRACE = true;
+//private static final boolean DO_TRACE = true;
 
+/** GPG extension .gpg */
   public static final String MY_ENCRYPT_EXTENSION = ".gpg";
+
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private MyWriteOrReadGpgFile ( ) {}
 
 
 //------------------------------------------------------------------------
@@ -53,10 +70,15 @@ public class MyWriteOrReadGpgFile  {
 
 
 //------------------  Method  ------------------
+/**
+ * This static method tries to find my standard password.
+ *
+ * @return Returns the password or null
+ */
   public static final String myGetStandardPas ()
   {
     try {
-      String nm = System.getProperty("user.home") + "/tmp/aapas";
+      String nm = System.getProperty("user.home") + MyMisc.myGetTmpDirectory() + "/aapas";
       File file = new File(nm);
       if ( !file.isFile() ) return null;
       ArrayList<String> dec = MyWriteOrReadGpgFile.myReadDecryptedFile(nm, "itsamypassword123", null);
@@ -73,7 +95,7 @@ public class MyWriteOrReadGpgFile  {
 
 //------------------  Method  ------------------
 /**
- * This method prints out data from a buffered reader and then closes the reader.
+ * This static method prints out data from a buffered reader and then closes the reader.
  *
  * @param reader  Buffered reader to read from and then close.
  * @param title  Title to print in front of the data
@@ -160,8 +182,10 @@ public class MyWriteOrReadGpgFile  {
  * @param data  Data to be encrypted in the form of a String.
  * @param passwordOrNull  The password if passphrase arg is used, otherwise null to flag using the key ring.
  * 
- * @throws IOException 
- * @throws InterruptedException 
+ * @throws IOException  Throws IO exception
+ * @throws InterruptedException  Throws interrupt exception
+ * 
+ * @return Returns exit status int
  */
   public static final int myWriteEncryptedFile(
       String outputFileName,
@@ -169,7 +193,7 @@ public class MyWriteOrReadGpgFile  {
       String passwordOrNull
       ) throws IOException, InterruptedException
   {
-//    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln(MyTrace.myGetMethodName() + ": outFile= " + outputFileName);
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln(MyTrace.myGetMethodName() + ": outFile= " + outputFileName);
 // Check that gpg2 is on system
     String gpgCmd = myGetPgpCommand();
     if ( gpgCmd == null ) throw new IOException( "MyWriteOrReadGpgFile.myWriteEncryptedFile" + ": no pgp executable");
@@ -195,7 +219,7 @@ public class MyWriteOrReadGpgFile  {
       cmd = new String[] { gpgCmd, "-c", "--batch", "--passphrase",  passwordOrNull, "-o", outputFileName };
     }
 //
-//if(DO_TRACE)System.out.println( MyTrace.myGetMethodName() + ": file= " + fileName + ": cmd= " + MyArrayOps.myArrayToString(cmd, ' ') );
+//if(DO_TRACE)System.out.println( MyTrace.myGetMethodName() + ": reach 1" + "\n file= " + outputFileName + "\n cmd= " + MyArrayOps.myArrayToString(cmd, ' ') );
 //
 // Create process builder
     ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -223,14 +247,16 @@ public class MyWriteOrReadGpgFile  {
 
 //------------------  Method  ------------------
 /**
- * This method reads in encrypted data from a file, decrypts it, and returns it as a ArrayList<String>.
+ * This method reads in encrypted data from a file, decrypts it, and returns it as a ArrayList.
  *
  * @param inputFileName  Encrypted data file to be read.
- * @param data   Output ArrayList<String> or null, in which case the method creates the ArrayList itself.
  * @param passwordOrNull   The password if passphrase arg is used, otherwise null to flag using the key ring.
+ * @param data   Output ArrayList or null, in which case the method creates the ArrayList itself.
  * 
- * @throws IOException 
- * @throws InterruptedException 
+ * @return  Returns an ArrayList of data
+ * 
+ * @throws IOException   Throws IO exception
+ * @throws InterruptedException  Throws interrupt exception
  */
   public static final ArrayList<String> myReadDecryptedFile(
       String            inputFileName,
@@ -238,9 +264,9 @@ public class MyWriteOrReadGpgFile  {
       ArrayList<String> data
       ) throws IOException, InterruptedException
   {
-//    if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": pw= " + passwordOrNull + ": file= " + inputFileName);
+//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": pw= " + passwordOrNull + ": file= " + inputFileName);
 //
-//    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln(MyTrace.myGetMethodName() + ": inFile= " + inputFileName);
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln(MyTrace.myGetMethodName() + ": inFile= " + inputFileName);
 //
     if ( data == null ) data = new ArrayList<>();
 // Check that gpg2 is on system
@@ -274,6 +300,8 @@ public class MyWriteOrReadGpgFile  {
     ProcessBuilder pb = new ProcessBuilder(cmd);
 // This is already the default
     pb.redirectInput(Redirect.PIPE);
+// Set output directory - don't need here
+//    pb.directory( new File( MyMisc.myGetTmpDirectory() ) );
 // Start process
     Process proc = pb.start();
 // Read decryted output
@@ -296,6 +324,8 @@ public class MyWriteOrReadGpgFile  {
 //------------------ Method ------------------
 /**
  * This method runs the test.
+ * 
+ * @param  outFile  Output file
  *
  * @return Returns true on success
  */
@@ -318,13 +348,13 @@ public class MyWriteOrReadGpgFile  {
                     "  Random stuff  8: 1fdicmewpsadmfeied9173043ucd&JJNT$$#(LMHG!^YIUJNUIU_+x\n" +
                     "  Random stuff  9: 1fdicmewpsadmfeied9173043ucd&JJNT$$#(LMHG!^YIUJNUIU_+x\n" +
                     "  Random stuff 10: 1fdicmewpsadmfeied9173043ucd&JJNT$$#(LMHG!^YIUJNUIU_+x\n" ;
-//      String outFile = "/tmp/zz_file_out";
+//      String outFile = MyMisc.myGetTmpDirectory() + "/zz_file_out";
 //
 // Test 1 - write encrypted file using key ring
       int retVal = MyWriteOrReadGpgFile.myWriteEncryptedFile(
          outFile,  // String fileName,
          data,     // String data,
-         null      // String passwordOrNull
+         "zzzdummypassword"      // String passwordOrNull
         );
       System.out.println("\n" + "MyWriteOrReadGpgFile.myRunGpgTest" + ": encrypt" + ": file= " + outFile + ": password= null" + ": retVal= " + retVal);
 //
@@ -364,6 +394,6 @@ public class MyWriteOrReadGpgFile  {
 * @param args String[] of input arguments
 * 
 */
-  static void main( String[] args ) { myRunGpgTest ( "/tmp/zz_file_out" ); }
+  static void main( String[] args ) { myRunGpgTest ( MyMisc.myGetTmpDirectory() + "/zz_file_out" ); }
 
 } //End: Class MyWriteOrReadGpgFile

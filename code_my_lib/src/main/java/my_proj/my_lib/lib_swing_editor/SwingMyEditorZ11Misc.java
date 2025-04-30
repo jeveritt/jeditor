@@ -24,15 +24,14 @@ package my_proj.my_lib.lib_swing_editor;
 
 //------------------  Import statements  ------------------
 
-import java.awt.Container;
-import java.awt.Window;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.net.URL;
 import java.util.ArrayList;
-
-import javax.swing.JInternalFrame;
 
 
 //--------------------------------------------------------------------
@@ -45,12 +44,52 @@ import javax.swing.JInternalFrame;
  */
 final class SwingMyEditorZ11Misc {
 
+//  private static final boolean DO_TRACE = true;
+  
 
 //------------------------------------------------------------------------
 //------------------------  Static Methods:  -----------------------------
 //------------------------------------------------------------------------
 
+  
+//------------------  Method  ------------------
+/**
+ * This method ?
+ *
+ * @param frags  ?
+ *
+ * @return  ?
+ */
+  static final String  myArrayToString( String[] frags )
+  {
+    StringBuffer sb = new StringBuffer();
+    for ( int i1=0 ; i1<frags.length ; i1++ ) {
+      if ( i1 > 0 ) sb.append(",");
+      sb.append(frags[i1]);
+    }
+    return sb.toString();
+  } //End: Method
 
+  
+//------------------  Method  ------------------
+/**
+ * This method ?
+ *
+ * @param frags  ?
+ *
+ * @return  ?
+ */
+  static final String  myArrayListToString( ArrayList<String> frags )
+  {
+    StringBuffer sb = new StringBuffer();
+    for ( int i1=0 ; i1<frags.size() ; i1++ ) {
+      if ( i1 > 0 ) sb.append(",");
+      sb.append(frags.get(i1));
+    }
+    return sb.toString();
+  } //End: Method
+
+  
 //------------------  Method  ------------------
 /**
  * This method ?
@@ -59,12 +98,13 @@ final class SwingMyEditorZ11Misc {
  *
  * @return  ?
  */
+/*
   static final Window myGetParentWindow( Container cont )
   {
     while ( (cont = cont.getParent()) != null && !(cont instanceof Window) ) {}
     return (Window)cont;
   } //End: Method
-
+*/
 
 //------------------  Method  ------------------
 /**
@@ -74,12 +114,13 @@ final class SwingMyEditorZ11Misc {
  *
  * @return  ?
  */
+/*
   static final Container myGetParentWindowOrInternalFrame( Container cont )
   {
     while ( (cont = cont.getParent()) != null && !(cont instanceof Window) && !(cont instanceof JInternalFrame) ) {}
     return cont;
   } //End: Method
-
+*/
 
 //------------------  Method  ------------------
 /**
@@ -128,6 +169,31 @@ final class SwingMyEditorZ11Misc {
       }
       return sb.toString();
     }
+  } //End: Method
+
+//------------------  Method  ------------------
+/**
+ * This static method ?
+ *
+ * @param imageFileName  ?
+ *
+ * @return  ?
+ *
+ * @throws Exception  Java standard exception
+ */
+  public static final Image myGetImage ( String imageFileName )
+  {
+    Image img = null;
+//
+    if ( imageFileName != null ) {
+// If in file_in_jar
+      ClassLoader cldr = SwingMyEditorZ11Misc.class.getClassLoader();
+// Note: The name of a resource is a '/'-separated path name that identifies the resource.
+      URL imageURL = cldr.getResource( imageFileName );
+      if (imageURL != null ) img = Toolkit.getDefaultToolkit().getImage(imageURL);
+    }
+//
+    return img;
   } //End: Method
 
 
@@ -229,20 +295,21 @@ final class SwingMyEditorZ11Misc {
 /**
  * This method is a simple String parser.
  *
- * @param inStr  Input String to be parsed
+ * @param inputStr  Input String to be parsed
  * @param parseCharStr String of parse characters
  * 
  * @return  Returns ArrayList<String> of parsed String including the parse chars
  */
-  static final ArrayList<String> myStringParser ( String inStr, String parseCharStr, boolean splitOutIntegers )
+  static final ArrayList<String> myStringParser ( String inputStr, String parseCharStr, boolean splitOutIntegers )
   {
     ArrayList<String> parsed = new ArrayList<>();
+    String inStr = inputStr;
 //
 // If the string exists but can't be parsed
-    if ( ( inStr != null && inStr.length() <= 2 ) || parseCharStr == null || parseCharStr.length() == 0 )
+    if ( ( inStr != null && inStr.length() < 2 ) || parseCharStr == null || parseCharStr.length() == 0 )
           parsed.add(inStr);
 // If I have enough info to do parsing
-    else if ( inStr != null && inStr.length() > 2 && parseCharStr != null && parseCharStr.length() > 0 ) {
+    else if ( inStr != null && inStr.length() >= 2 && parseCharStr != null && parseCharStr.length() > 0 ) {
 // Scan thru input string
       while ( inStr != null && inStr.length() > 0 ) {
 // Find next index of parser char
@@ -265,6 +332,8 @@ final class SwingMyEditorZ11Misc {
       } //End: while
     } //End: if ()
 //
+//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": reach 1" + ": str= " + inputStr + ": pars= " + parseCharStr + ": spltI= " + splitOutIntegers + ": ret= " + SwingMyEditorZ11Misc.myArrayListToString(parsed));
+//
 // If also split out integers
     if ( splitOutIntegers && parsed.size() > 0 ) {
       ArrayList<String> parsedOld = parsed;
@@ -274,6 +343,8 @@ final class SwingMyEditorZ11Misc {
         for ( String str2 : frags ) parsed.add(str2);
       }
     } //End: if ()
+//
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + ": exiting" + ": str= " + inputStr + ": pars= " + parseCharStr + ": spltI= " + splitOutIntegers + ": ret= " + SwingMyEditorZ11Misc.myArrayListToString(parsed));
 //
     return parsed;
   } //End: Method
@@ -302,10 +373,13 @@ final class SwingMyEditorZ11Misc {
           parsed.add(inStr.substring(lastTrans, i1));
           lastTrans = i1;
         }
-        else if (i1 == inStr.length()-1 ) parsed.add(inStr.substring(lastTrans));
+        if ( i1 == inStr.length()-1 ) parsed.add(inStr.substring(lastTrans));
+//
         lastIsInt = isInt;
       }
     } //End: else if
+//
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + ": exiting" + ": str= " + inStr + ": ret= " + SwingMyEditorZ11Misc.myArrayListToString(parsed));
 //
     return parsed;
   } //End: Method

@@ -14,12 +14,30 @@ import java.util.ArrayList;
  */
 public class MyReadOption {
 
+/** Specifies no argument */
   public final static int MY_READ_OPT_NO_ARG = -1;
+/** Specifies error */
   public final static int MY_READ_OPT_ERROR  = -2;
 
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private MyReadOption ( ) {}
+
+  
 //------------------------------------------------------------------------
 //--------------------------  Static Methods:  ---------------------------
 //------------------------------------------------------------------------
+
+
 /**
  * This static method returns a pointer to matched arguments
  * <pre>
@@ -50,7 +68,17 @@ public class MyReadOption {
   { return MyReadOption.myGetKeyIndex(argsIn, key, numbArgsAfter, 0); }
 
 
-  public static final int myGetKeyIndex (
+/**
+ * This static method
+ * 
+ * @param argsIn  ?
+ * @param option  ?
+ * @param numbArgsAfter  ?
+ * @param startingIndx  ?
+ *
+ * @return ?
+ */
+ public static final int myGetKeyIndex (
     String      argsIn[],        // Pointers to argument words
     String      option,          // Option word being searched for
     int         numbArgsAfter,   // Number argv's before next -
@@ -89,6 +117,15 @@ public class MyReadOption {
 
 
 //------------------  Method  ------------------
+/**
+ * This static method
+ * 
+ * @param argsIn  ?
+ * @param key  ?
+ * @param numbArgsAfter  ?
+ *
+ * @return ?
+ */
   public static final int myGetKeyIndex (
       ArrayList<String> argsIn,          // Pointers to argument words
       String            key,             // Option word being searched for
@@ -169,6 +206,53 @@ public class MyReadOption {
       for ( i1=0 ; argsOut != null && i1<argsOut.length ; i1++ ) {
         if ( argsOut[i1].startsWith("\"") || argsOut[i1].startsWith("'") ) {
           argsOut[i1] = argsOut[i1].substring(1, argsOut[i1].length() - 2);
+        }
+      } //End: for ()
+    } //End: if ()
+//
+    return argsOut;
+  } //End: Method
+
+//------------------  Method  ------------------
+/**
+ * This static method returns string array of args after key
+ * <pre>
+ *  Usage example:
+ *  
+ *   import library.MyMisc.*;
+ *
+ *   String args[] = {"-arg1", "val1", "-arg2", "val2"};
+ *
+ *   argValues = MyReadOption.myArgsAfterKey (args,"-arg2");
+ *
+ * </pre>
+ *
+ * @param argsIn  input String array
+ * @param key  String argument to search for
+ *
+ * @return  String array of arg values or null arg does not exist or no values
+ *
+ */
+  public static final ArrayList<String> myArgsAryLstAfterKey( String argsIn[], String key )
+  {
+    ArrayList<String> argsOut = new ArrayList<>();
+//
+    if ( argsIn != null && key != null ) {
+//
+// Figure out range of args
+      int i1;
+      boolean found = false;
+      for ( String arg : argsIn ) {
+        if ( !found && key.equals(arg) ) found = true;
+        else if ( found && arg.startsWith("-") ) break;
+        else if ( found ) argsOut.add(arg);
+      } //End: for ()
+//
+// Get rid of quotes
+      for ( i1=0 ; argsOut != null && i1<argsOut.size() ; i1++ ) {
+        String arg = argsOut.get(i1);
+        if ( arg.startsWith("\"") || arg.startsWith("'") ) {
+          argsOut.set(i1, arg.substring(1, arg.length() - 2) );
         }
       } //End: for ()
     } //End: if ()

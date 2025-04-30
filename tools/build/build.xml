@@ -5,7 +5,7 @@
        cd <dir_with_this_build.xml>
        ant
 -->
-<project name="all_java" default="Main Build" basedir="..">
+<project name="all_java" default="Main Build" basedir="../..">
 
     <property name="codeJeditor"        location="${basedir}/code_jeditor/src/main/java" />
     <property name="codeMyLib"          location="${basedir}/code_my_lib/src/main/java" />

@@ -26,10 +26,9 @@ package my_proj.my_lib.lib_swing_editor;
 
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.Image;
+import java.awt.Window;
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.JDialog;
@@ -39,7 +38,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
+import my_proj.my_lib.lib.MyApplicationInterface;
+import my_proj.my_lib.lib.MyMisc;
 import my_proj.my_lib.lib.MyReadOption;
+import my_proj.my_lib.lib.MyTrace;
 import my_proj.my_lib.lib_encrypt.call_gpg.MyWriteOrReadGpgFile;
 import my_proj.my_lib.lib_swing.SwingMyJDialogForPassword;
 
@@ -52,14 +54,26 @@ import my_proj.my_lib.lib_swing.SwingMyJDialogForPassword;
  */
 public final class SwingMyEditorZ03Handler {
 
-//  private static final boolean DO_TRACE = true;
+//private static final boolean DO_TRACE = true;
+
+
+//------------------------------------------------------------------------
+//--------------------------  Methods:  ----------------------------------
+//------------------------------------------------------------------------
+
+
+//------------------  Method  ------------------
+/**
+ * This is the constructor that should never be called
+ * 
+ */
+  private SwingMyEditorZ03Handler ( ) {}
 
 
 //------------------------------------------------------------------------
 //-----------------------  Static Methods:  ------------------------------
 //------------------------------------------------------------------------
-
-
+  
 //------------------  Method ------------------
 /**
  * This method prints out a help standard verbage.
@@ -67,110 +81,187 @@ public final class SwingMyEditorZ03Handler {
  * @param programPathName  ?
  * @param shortProgramDescription  ?
  */
-  private static void myAppPrintHelpStandardVerbage ( String programPathName, String shortProgramDescription )
+  private static final void myAppGetHelpStandardVerbage ( String indent, String programPathName, String shortProgramDescription, StringBuffer sb )
   {
-    //
-    System.out.println(shortProgramDescription);
 //
-    System.out.println("  Usage:");
-    System.out.println("      [<java_path>/]java -cp <path_to_jar>/<jar_name>.jar " + programPathName + " [options]");
-    System.out.println("     or if class files not in file_in_jar form:");
-    System.out.println("      [<java_path>/]java [-cp <path_to_java_classes>] " + programPathName + " [options]");
-    System.out.println("    Base:");
-    System.out.println("      [<java_path>/]java          : Path and name for the java virtual machine executable");
-    System.out.println("                                  : Path not needed if included in executable path variable PATH");
-    System.out.println("      [-cp <class_path>]          : Path to dir containing java classes needed for this application");
-    System.out.println("                                       or to java archive file (<name>.jar) of the java classes");
-    System.out.println("                                  : Not needed if set in java variable CLASS_PATH");
-    System.out.println("      " + programPathName );
-    System.out.println("                                  : Program name");
+    sb.append( indent + shortProgramDescription + "\n" );
+//
+    sb.append( indent + "  Usage for stand alone editor:" + "\n" );
+    sb.append( indent + "        [<java_path>/]java -cp <path_to_jar>/jeditor.jar " + programPathName + " [options]" + "\n" );
+    sb.append( indent + "    Base:" + "\n" );
+    sb.append( indent + "        [<java_path>/]java          : Path and name for the java virtual machine executable" + "\n" );
+    sb.append( indent + "                                    : Path not needed if included in executable path variable PATH" + "\n" );
+    sb.append( indent + "        [-cp <class_path>]          : Path to dir containing java classes needed for this application" + "\n" );
+    sb.append( indent + "                                         or to java archive file (<name>.jar) of the java classes" + "\n" );
+    sb.append( indent + "                                    : Not needed if set in java variable CLASS_PATH" + "\n" );
+    sb.append( indent + "        " + programPathName  + "  : Program name" + "\n" );
   } //End: Method
 
 
 //------------------  Method  ------------------
 /**
- * This method prints help information.
+ * This method prints instructions on starting the program.
  *
+ * @param indent  ?
+ * 
+ * @return  Returns help
  */
-  public static final void myPrintHelp ( String programPathName )
+  public static final String myGetHelp ( String indent )
   {
-//    String programPathName = SwingMyEditorZ00AppIfc.class.getName();
+    String programPathName;
+    if      ( SwingMyEditorConst.myType == SwingMyEditorConst.MY_TYPE.FRAME )     programPathName = SwingMyEditorJFrame.class.getName();
+    else if ( SwingMyEditorConst.myType == SwingMyEditorConst.MY_TYPE.INT_FRAME ) programPathName = SwingMyEditorJInternalFrame.class.getName();
+    else if ( SwingMyEditorConst.myType == SwingMyEditorConst.MY_TYPE.DIALOG )    programPathName = SwingMyEditorJDialog.class.getName();
+    else programPathName = "SwingMyEditor";
+//
+    StringBuffer sb = new StringBuffer();
+    if ( indent == null ) indent = "";
+//
     String description =
-        "  The \"" + programPathName + "\" program provices a simple vi like text editor written in Java.";
+          "The \"" + programPathName + "\" program provices a simple vi like text editor written in Java." +
+          "\n  A sub-class can also be incorporated into other Java programs to provide a file editor function.";
 //
-    myAppPrintHelpStandardVerbage( programPathName, description );
+    myAppGetHelpStandardVerbage( indent, programPathName, description, sb );
 //
-    System.out.println("    Options:");
-    System.out.println("      -file <file_name>           : File to be opened");
-    System.out.println("      -dir <directory_name>       : Start editor specified directory");
-    System.out.println("      -ops                        : Allow various file operations");
-    System.out.println("      -ro                         : Set file to read only");
-    System.out.println("      -rw                         : Set file to read/write");
-    System.out.println("      -pw <password>              : Password for encrypted file");
-    System.out.println("      -isenc                      : Indicates file is encrypted");
-    System.out.println("      -enro                       : Set file to encrypted read only");
-    System.out.println("      -enrw                       : Set file to encrypted read/write");
-    System.out.println("      -nomenu                     : Causes menu tool bar to not be shown");
-    System.out.println("      -sizex <width>              : Width of GUI");
-    System.out.println("      -sizey <height>             : Height of GUI");
+    sb.append( indent + "    Options:" + "\n" );
+    sb.append( indent + "      -file <file_name>           : File to be opened at start of program" + "\n" );
+    sb.append( indent + "      -dir <directory_name>       : Start editor pointing to specified directory" + "\n" );
+    sb.append( indent + "      -ro                         : Set editor to read only" + "\n" );
+    sb.append( indent + "      -rw                         : Set editor to read/write" + "\n" );
+    sb.append( indent + "      -pw <password>              : Password for encrypted file" + "\n" );
+    sb.append( indent + "      -isenc                      : Indicates file is encrypted" + "\n" );
+    sb.append( indent + "      -enro                       : Set editor to encrypted read only" + "\n" );
+    sb.append( indent + "      -enrw                       : Set editor to encrypted read/write" + "\n" );
+    sb.append( indent + "      -nomenu                     : No menus implies only view starting file" + "\n" );
+    sb.append( indent + "      -sizex <width>              : Width of GUI" + "\n" );
+    sb.append( indent + "      -sizey <height>             : Height of GUI" + "\n" );
 //
-    System.out.println("      --help|-help|--h|-h         : Prints this message");
+    sb.append( indent + "      --help|-help|--h|-h         : Prints this message and exits" + "\n" );
 //
-    System.out.println("    Example:");
-    System.out.println("       java \\");
-    System.out.println("         -cp <path_to_jar_dir>/<jar_name>.jar \\");
-    System.out.println("           " + programPathName + " \\");
-    System.out.println("             -nolic -noconsole");
+    sb.append( indent + "    Example for stand alone editor:" + "\n" );
+    sb.append( indent + "       java \\" + "\n" );
+    sb.append( indent + "         -cp <path_to_jar_dir>/jeditor.jar" + " \\" + "\n" );
+    sb.append( indent + "           " + programPathName + " \\" + "\n" );
+    sb.append( indent + "             " + "-rw" + " \\" + "\n" );
+    sb.append( indent + "               " + "-file <file_name>" + "\n" );
+//
+    return sb.toString();
   } //End: Method
 
 
 //------------------  Method  ------------------
 /**
- * This method prints help information.
+ * This method returns a short program description and operation cheat sheet.
  *
+ * @return  Returns info String
  */
   static final String myGetAppHelpString ( )
   {
     String data =
-        "This is a simple text viewer and vi like text editor for Java.\n" +
-        "Vi has a command and a text edit mode. Enter command mode\n" +
-        "with the 'esc' key, enter the edit mode with the 'i' or 'a' key.\n" +
-        "When in command mode the ':' key shifts to the command line.\n" +
-        "This program is implemented using the Swing library. It also\n" +
-        "supports some GUI like stuff built into the swing component.\n" +
+        "This is a simple text editor for Java. It has a vi like mode and a\n" +
+        "GUI mode. It is similar to a simplified VIM program.\n" +
+        "The program is implemented using the Swing library. The GUI mode\n" +
+        "is built into the library itself and behaves in a pretty standard way.\n" +
         "\n" +
-        "  Edit window edit mode key stroke to enter command mode:\n" +
-        "    Esc -> Shift to entering commands on command line\n" +
+        "Modes are as follows:\n" +
+        "    GUI: works in parallel with Vi->Text mode\n" +
+        "    Vi:\n" +
+        "        Text mode: enter from command mode by typing \"i\" or \"a\"\n" +
+        "        Command mode: enter from text mode with <esc> key\n" +
+        "            Direct: command executed by typing in edit window\n"+
+        "            CmdLn: type \":\" for cmd line then <cmd><return>\n"+
         "\n" +
-        "  Edit window command mode key strokes:\n" +
-        "    :     -> Shift to command line\n" +
-        "    a     -> Return to text entry mode and move carot right 1\n" +
-        "             (Not useful because editor differs from traditional vi)\n" +
-        "    dd    -> Delete line under carot\n" +
-        "    <n>dd -> Delete n lines starting under carot\n" +
-        "    h     -> Shift left 1 char\n" +
-        "    i     -> Return to text entry mode\n" +
-        "    j     -> Shift down 1 line\n" +
-        "    k     -> Shift up 1 line\n" +
-        "    l     -> Shift right 1 char\n" +
-        "    n     -> Search for next match string\n" +
-        "    p     -> Puts back the yanked text\n" +
-        "    u     -> Undo last operation\n" +
-        "    x     -> Delete char\n" +
-        "    yy    -> Delete and save line under carot\n" +
-        "    <n>yy -> Delete and save n lines starting under carot\n" +
+        "Vi mode details:\n" +
         "\n" +
-        "  Command line commands:\n" +
-        "    /<match_string> -> search for match string\n" +
-        "    w  -> write\n" +
-        "    q  -> quit without writing\n" +
-        "    wq -> write and then quit\n" +
-        "    !q -> force quit without writing\n" +
-        "    1  -> move to first line\n" +
-        "    $  -> move to last line\n" +
+        "  Text mode:\n" +
+        "     Edit window key strokes simply add text\n" +
+        "     Esc key -> Shift to command mode\n" +
+        "\n" +
+        "  Command mode edit window key stroke commands:\n" +
+        "     :     -> Shift to command line\n" +
+        "     a     -> Return to text entry mode and move caret right 1\n" +
+        "     <n>dd -> Delete one or n lines starting under caret\n" +
+        "     h     -> Shift left 1 char\n" +
+        "     i     -> Return to text entry mode\n" +
+        "     j     -> Shift down 1 line\n" +
+        "     k     -> Shift up 1 line\n" +
+        "     l     -> Shift right 1 char\n" +
+        "     n     -> Forward search for next match string\n" +
+        "     N     -> Backward search for next match string\n" +
+        "     p     -> Insert copied text under line with caret\n" +
+        "     u     -> Undo last operation(s)\n" +
+        "     x     -> Delete char\n" +
+        "     <n>yy -> Copy one or n lines starting with caret to clip board\n" +
+        "\n" +
+        "  Command mode command line commands ->  :<cmd><return>\n" +
+        "     /<match_string> -> search for match string\n" +
+        "     w  -> write\n" +
+        "     q  -> quit without writing\n" +
+        "     wq -> write and then quit\n" +
+        "     !q -> force quit without writing\n" +
+        "     1  -> move to first line\n" +
+        "     $  -> move to last line\n" +
         "\n";
     return data;
   } //End: Method
+
+
+//------------------  Method  ------------------
+/**
+ * This method checks input arguments.
+ * 
+ * @param inputArgs  ?
+ *
+ * @return  ?
+ */
+  static final String myAppCheckArgsOk ( String[] inputArgs )
+  {
+//    return SwingMyEditorZ01AppIfc.myAppCheckArgsOkSub(inputArgs,  SwingMyEditorJFrame.class.getName() );
+    //    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": args= " + MyStringOps.myStringArrayToString(inputArgs, ',') );
+//
+    if ( inputArgs.length == 1 && !inputArgs[0].startsWith("-") ) return null;
+//
+    String[] allowableSingleArgs = new String[] {
+        "-h","-help","--h","--help",
+        MyApplicationInterface.ARG_NO_CONSOLE,
+        MyApplicationInterface.ARG_NO_LIC,
+        MyApplicationInterface.ARG_VERBOSE,
+        MyApplicationInterface.ARG_QUIET,
+        SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED,
+        SwingMyEditorConst.ARG_ALLOW_READ_ONLY,
+        SwingMyEditorConst.ARG_ALLOW_READ_WRITE,
+        SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_ONLY,
+        SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE,
+        SwingMyEditorConst.ARG_NO_MENU
+      };
+//
+    String[] allowableDoubleArgs = new String[] {
+        MyApplicationInterface.ARG_VERBOSE,
+        SwingMyEditorConst.ARG_TITLE,
+        SwingMyEditorConst.ARG_FILE,
+        SwingMyEditorConst.ARG_CONTROL,
+        SwingMyEditorConst.ARG_PASSWORD,
+        SwingMyEditorConst.ARG_SIZE_X,
+        SwingMyEditorConst.ARG_SIZE_Y,
+        SwingMyEditorConst.ARG_WORKING_DIR
+      };
+//
+    String[] allowableMultArgs = null;
+//
+    String[] requiredArgs = null;
+//
+    String badArg = MyApplicationInterface.myAppCheckInputArgs ( inputArgs, allowableSingleArgs, allowableDoubleArgs, allowableMultArgs, requiredArgs, null );
+//
+    if ( badArg != null ) {
+      System.out.println();
+      System.out.println("---- Error: program = " + SwingMyEditorJFrame.class.getName() + " : " + badArg + " ----");
+      System.out.println();
+      System.out.println("Required syntax:");
+      System.out.print( SwingMyEditorZ03Handler.myGetHelp( "  " ) );
+    }
+//
+    return badArg;
+  } //End: method
 
 
 //------------------  Method  ------------------
@@ -181,7 +272,7 @@ public final class SwingMyEditorZ03Handler {
  *
  * @return  Editor configuration control int
  */
-  static final int myGetCtrlIntFromInputArgs ( String[] args )
+  private static final int myGetCtrlIntFromInputArgs ( String[] args )
   {
     int ctrl = 0;
 //
@@ -191,10 +282,6 @@ public final class SwingMyEditorZ03Handler {
                                   MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE);
     boolean canWriteUnencrypted = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_READ_WRITE);
     boolean canWriteEncrypted   = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE);
-//
-    if ( MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_FILE_OPS) ||
-           canWriteUnencrypted || canWriteEncrypted )
-      ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_FILE_OPS;
 //
     if ( canReadUnencrypt ) ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ;
 //
@@ -222,7 +309,7 @@ public final class SwingMyEditorZ03Handler {
  *
  * @return output String
  */
-  public static String myGetFileNameWithNameBeforePath ( String name )
+  private static final String myGetFileNameWithNameBeforePath ( String name )
   {
     if ( name == null || name.length() < 3 ) return name;
     int slIndx = name.lastIndexOf('/');
@@ -233,129 +320,120 @@ public final class SwingMyEditorZ03Handler {
   } //End: Method
 
 
-//------------------ Method ------------------
+//------------------  Method  ------------------
 /**
- * This method 
+ * This method returns info about program status.
+ *
+ * @param ind  Amount to indent
+ * @param title  First line title or null
  * 
- * @param args String[] of input arguments that are ignored
+ * @return  Return info string
  */
-  public static final void myInitialize( String[] args, boolean putInDialog )
+  static final String myGetInfoString( String ind, int ctrl, SwingMyEditorZ04JPanel editPan )
   {
-    String fileName = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_FILE);
-    if ( fileName == null && args != null && args.length == 1 ) fileName = args[0];
-    String title = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_TITLE);
-    if ( title == null ) title = fileName;
-    if ( title == null ) title = "Test";
-    int sizex = MyReadOption.myIntValueAfterKey(600, args, SwingMyEditorConst.ARG_SIZE_X);
-    int sizey = MyReadOption.myIntValueAfterKey(700, args, SwingMyEditorConst.ARG_SIZE_Y);
-    int ctrl = SwingMyEditorZ03Handler.myGetCtrlIntFromInputArgs(args);
+    StringBuffer sb = new StringBuffer();
 //
-    JFrame fr = new JFrame(title);
-    fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    SwingMyEditorConst.myGetEditorConstInfo( ctrl, sb, ind);
+    editPan.myGetTextArea().myGetInfoString(ind, sb);
 //
-    JDialog dlg = !putInDialog ? null : new JDialog(fr, title);
-//
-    String password = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_PASSWORD);
-//
-    String workingDirName = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_WORKING_DIR);
-    if ( workingDirName == null ) workingDirName = System.getProperty("user.home");
-//
-//Create edit panel
-    SwingMyEditorZ04JPanel editPanel = SwingMyEditorZ03Handler.myInitializeFromFile(
-         putInDialog ? dlg : fr,           // Container   cont
-         title,                            // String      title
-         fileName == null ? null : new File(fileName),  // File  dataFile
-         ctrl,                             // int         ctrl
-         sizex,                            // int         sizeX
-         sizey,                            // int         sizeY
-         null,                             // JMenu[]     custom
-         password,                         // String      password
-         workingDirName                    // String      workingDirName
-         );
-//Set application image
-    ClassLoader cl = SwingMyEditorZ03Handler.class.getClassLoader();
-    URL imageURL = cl.getResource( "my_proj/my_lib_resources/my_gifs/jedit_icon_26x26.gif" );
-    Image img = ( imageURL == null ) ? null : Toolkit.getDefaultToolkit().getImage(imageURL);
-    if ( img != null ) fr.setIconImage(img);
-//
-//If just JFrame
-    if ( !putInDialog ) {
-//Set edit panel as content pane
-      fr.setContentPane(editPanel);
-//Create and set menu
-      fr.setJMenuBar( editPanel.myCreateMenuBar(null) );
-      fr.pack();
-    }
-//Else put in dialog
-    else {
-      fr.setSize(400, 300);
-    }
-//Final setup
-    fr.setLocationRelativeTo(null);
-    fr.setVisible(true);
+    return sb.toString();
   } //End: Method
 
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates, initializes and returns a SwingMyEditorZ04JPanel using an input args array.
  * 
  * @param cont  ?
  * @param args  ?
  *
+ * @return  Returns SwingMyEditorZ04JPanel
  */
-  static final SwingMyEditorZ04JPanel myInitializeFromFile ( Container cont, String[] args )
+  public static final SwingMyEditorZ04JPanel myInitializeFromArgs (
+      Container  cont,
+      String[]   args
+      )
   {
-//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName());
-//
+// Possibly set trace
+    int verboseLvl = MyReadOption.myIntValueAfterKey( -1, args, SwingMyEditorConst.ARG_VERBOSE );
+    if ( verboseLvl > 0 ) {
+      String verboseFileNm = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_TRACE_OUTPUT);
+      if ( verboseFileNm == null ) verboseFileNm = MyMisc.myGetTmpDirectory() + "/zz_lib_swing_editor_trace.txt";
+      MyTrace.mySetVerboseLevel(verboseLvl, verboseFileNm);
+    }
+// Trace info
+    if ( MyTrace.myDoPrint() ) {
+      MyTrace.myPrintln(MyTrace.myInd() + MyTrace.myGetMethodName() + ": cont= " + (cont == null ? "null" : cont.getName() ) );
+      if ( args.length == 0 ) MyTrace.myPrintln(MyTrace.myInd() + "  args: no args");
+      else {
+        MyTrace.myPrintln(MyTrace.myIndWithoutPrefix() + "  args:");
+        for ( String str : args ) MyTrace.myPrintln(MyTrace.myIndWithoutPrefix() + "    " + str);
+      }
+    }
+// Define font
+    
+// Starting file name or null
     String fileName = ( args.length == 1 ) ? args[0] : MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_FILE);
-//
-    File file = ( fileName == null ) ? null : new File(fileName);
-//
+    File startingDataFile = ( fileName == null ) ? null : new File(fileName);
+// Title
     String title;
     if ( fileName == null ) title = "Empty File";
     else title = myGetFileNameWithNameBeforePath(fileName);
-//
+// Password
     String password = MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_PASSWORD);
-//
+// Control int
     int ctrl = myGetCtrlIntFromInputArgs(args);
-//
+// Handle encryption
+    boolean startingDataFileIsEncrypted = startingDataFile != null &&
+        startingDataFile.isFile() &&
+        (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ) != 0 &&
+        ( startingDataFile.getName().endsWith(SwingMyEditorConst.MY_ENCRYPT_EXTENSION) ||
+          MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED ) )
+        ;
+// Define size
     int sizeX = MyReadOption.myIntValueAfterKey(600, args, SwingMyEditorConst.ARG_SIZE_X);
     int sizeY = MyReadOption.myIntValueAfterKey(400, args, SwingMyEditorConst.ARG_SIZE_Y);
-//
+// Get working directory
     String workingDirName = MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_WORKING_DIR);
-//
+// Create editor
     SwingMyEditorZ04JPanel editorPanel = myInitializeFromFile(
-        cont,           // Container      cont,
-        title,          // String         title,
-        file,           // File           dataFile,
-        ctrl,           // int            ctrl,
-        sizeX, sizeY,   // int sizeX, int sizeY,
-        null,           // JMenu[]        custom
-        password,       // String         password
-        workingDirName  // String         workingDirName
+        cont,                        // Container      cont,
+        title,                       // String         title,
+        startingDataFile,            // File           dataFile,
+        startingDataFileIsEncrypted, // boolean        startingDataFileIsEncrypted
+        ctrl,                        // int            ctrl,
+        sizeX, sizeY,                // int sizeX, int sizeY,
+        null,                        // JMenu[]        custom
+        password,                    // String         password
+        workingDirName               // String         workingDirName
         );
+//
     return editorPanel;
   } //End: Method
 
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates, initializes and returns a SwingMyEditorZ04JPanel using a File as the initial data.
  *
  * @param cont  ?
  * @param title  ?
- * @param dataFile  ?
+ * @param startingDataFile  ?
+ * @param startingDataFileIsEncrypted  ?
  * @param ctrl  ?
  * @param sizeX  ?
  * @param sizeY  ?
- * @param supplementalActions  ?
+ * @param custom  ?
+ * @param password  ?
+ * @param workingDirName  ?
  * 
+ * @return  Returns SwingMyEditorZ04JPanel
  */
   static final SwingMyEditorZ04JPanel myInitializeFromFile (
       Container      cont,
       String         title,
-      File           dataFile,
+      File           startingDataFile,
+      boolean        startingDataFileIsEncrypted,
       int            ctrl,
       int sizeX, int sizeY,
       JMenu[]        custom,
@@ -363,7 +441,7 @@ public final class SwingMyEditorZ03Handler {
       String         workingDirName
       )
   {
-//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": ctrl= 0x" + Integer.toHexString(ctrl) + "\n dir= " + workingDirName + "\n file= " + (dataFile == null ? "null" : dataFile.getAbsolutePath()) + "\n cont= " + cont);
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName()  + ": ctrl= 0x" + Integer.toHexString(ctrl) + ": cont= " + (cont == null ? null : cont.getName()) + MyTrace.myNlInd() + " dir= " + workingDirName  + MyTrace.myNlInd() + " file= " + (startingDataFile == null ? "null" : startingDataFile.getAbsolutePath()) );
 //
     SwingMyEditorZ04JPanel editorPanel = null;
     try {
@@ -375,31 +453,31 @@ public final class SwingMyEditorZ03Handler {
       if ( password == null && readOrWriteEncryp ) {
         password = MyWriteOrReadGpgFile.myGetStandardPas();
         if ( password == null ) {
-          JFrame jfr = ( cont instanceof JFrame ) ? (JFrame)cont : null;
-          if ( jfr != null ) password = SwingMyJDialogForPassword.myGetPassword(jfr);
+          Window window = ( cont instanceof Window ) ? (Window)cont : null;
+          if ( window != null ) password = SwingMyJDialogForPassword.myGetPassword(window);
         }
       }
 // Read in data
       String textDataAsString = null;
-        if ( dataFile != null && dataFile.isFile() ) {
+        if ( startingDataFile != null && startingDataFile.isFile() ) {
         ArrayList<String> al;
-        if ( readEncrypt ) al = MyWriteOrReadGpgFile.myReadDecryptedFile(dataFile.getCanonicalPath(), password, null);
-        else al = SwingMyEditorZ11Misc.myGetFileContentsAsArrayList(dataFile, null);
+        if ( readEncrypt && startingDataFileIsEncrypted ) al = MyWriteOrReadGpgFile.myReadDecryptedFile(startingDataFile.getCanonicalPath(), password, null);
+        else al = SwingMyEditorZ11Misc.myGetFileContentsAsArrayList(startingDataFile, null);
         textDataAsString = SwingMyEditorZ11Misc.myGetFileContentsAsString(al, "");
       }
 //
 // Do initialization
       editorPanel = myInitialize(
-          cont,             // Container        cont
-          title,            // String           title,
-          textDataAsString, // String           textDataAsString,
-          ctrl,             // int              ctrl,
-          sizeX,            // int              sizeX,
-          sizeY,            // int              sizeY,
-          custom,           // JMenu[]          custom
-          password,         // String           password
-          dataFile,         // File             saveDataFile
-          workingDirName    // String           workingDirName
+          cont,               // Container        cont
+          title,              // String           title,
+          textDataAsString,   // String           textDataAsString,
+          ctrl,               // int              ctrl,
+          sizeX,              // int              sizeX,
+          sizeY,              // int              sizeY,
+          custom,             // JMenu[]          custom
+          password,           // String           password
+          startingDataFile,   // File             saveDataFile
+          workingDirName      // String           workingDirName
           );
     }
 //
@@ -413,15 +491,15 @@ public final class SwingMyEditorZ03Handler {
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates, initializes and returns a SwingMyEditorZ04JPanel using a ArrayList<String> as the initial data.
  *
  * @param cont  ?
  * @param title  ?
  * @param list  ?
  * @param ctrl  ?
- * @param modalityType  ?
  * @param custom  ?
  *
+ * @return  Returns SwingMyEditorZ04JPanel
  */
   static final SwingMyEditorZ04JPanel myInitializeFromStringArray (
       Container         cont,
@@ -429,7 +507,9 @@ public final class SwingMyEditorZ03Handler {
       ArrayList<String> list,
       int               ctrl,
       JMenu[]           custom )
-{
+  {
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName()  + ": ctrl= 0x" + Integer.toHexString(ctrl) + MyTrace.myNlInd() + MyTrace.myNlInd() );
+//
     SwingMyEditorZ04JPanel editorPanel = null;
     try {
       String textDataAsString = SwingMyEditorZ11Misc.myGetFileContentsAsString(list, "");
@@ -456,7 +536,7 @@ public final class SwingMyEditorZ03Handler {
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates, initializes and returns a SwingMyEditorZ04JPanel using a String as the initial data.
  *
  * @param cont  ?
  * @param title  ?
@@ -464,9 +544,9 @@ public final class SwingMyEditorZ03Handler {
  * @param ctrl  ?
  * @param sizeX  ?
  * @param sizeY  ?
- * @param modalityType ?
  * @param custom  ?
  *
+ * @return  Returns SwingMyEditorZ04JPanel
  */
   public static final SwingMyEditorZ04JPanel myInitializeFromString (
       Container    cont,
@@ -477,9 +557,22 @@ public final class SwingMyEditorZ03Handler {
       int          sizeY,
       JMenu[]      custom )
   {
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName()  + ": ctrl= 0x" + Integer.toHexString(ctrl) + MyTrace.myNlInd() + MyTrace.myNlInd() );
+//
     SwingMyEditorZ04JPanel editPanel = null;
     try {
-      editPanel = SwingMyEditorZ03Handler.myInitialize( cont, title, dataStr, ctrl, sizeX, sizeY, custom, null, null, null );
+      editPanel = SwingMyEditorZ03Handler.myInitialize(
+          cont,               // Container        cont
+          title,              // String           title
+          dataStr,            // String           textDataAsString
+          ctrl,               // int              ctrl
+          sizeX,              // int              sizeX
+          sizeY,              // int              sizeY
+          custom,             // JMenu[]          custom
+          null,               // String           password
+          null,               // File             saveDataFile
+          null                // String           workingDirName
+          );
     }
     catch (Exception e) {
       System.out.println( "SwingMyEditorZ00Handler.myInitializeFromString: exc= " + e.getMessage());
@@ -492,15 +585,21 @@ public final class SwingMyEditorZ03Handler {
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates and returns a SwingMyEditorZ04JPanel
  *
+ * @param callingProgramName  ?
  * @param cont  ?
  * @param title  ?
- * @param dataFile  ?
+ * @param textDataAsString  ?
  * @param ctrl  ?
  * @param sizeX  ?
  * @param sizeY  ?
+ * @param custom  ?
+ * @param password  ?
+ * @param saveDataFile  ?
+ * @param workingDirName  ?
  *
+ * @return  Returns SwingMyEditorZ04JPanel
  */
   static final SwingMyEditorZ04JPanel myInitialize (
       Container        cont,
@@ -513,34 +612,44 @@ public final class SwingMyEditorZ03Handler {
       File             saveDataFile,
       String           workingDirName
       ) {
-//if(DO_TRACE)System.out.println("\n" + MyTrace.myGetMethodName() + ": ctrl= 0x" + Integer.toHexString(ctrl) + "\n dir= " + workingDirName + "\n file= " + (saveDataFile == null ? "null" : saveDataFile.getAbsolutePath()) + "\n cont= " + cont);
-//
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": ctrl= 0x" + Integer.toHexString(ctrl) + ": cont= " + (cont == null ? null : cont.getName()) + ": file= " + saveDataFile);
+// If ctrl == 0 which means you can't do anything then set for read/write
+    if ( ctrl == 0 ) ctrl =  SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ | SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE;
+// Get password if necessary
     boolean readOrWriteEncryp = (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ) != 0 ||
                                 (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0 ;
     if ( password == null && readOrWriteEncryp ) password = MyWriteOrReadGpgFile.myGetStandardPas();
-//
+// Create edit panel
     SwingMyEditorZ04JPanel editorPanel = new SwingMyEditorZ04JPanel(
-        textDataAsString, // String     textDataAsString
-        ctrl,             // int        ctrl,
-        null,             // JComponent lowerPanel
-        password,         // String     password
-        saveDataFile,     // File       saveDataFile
-        workingDirName    // String     workingDirName
+        textDataAsString,   // String     textDataAsString
+        ctrl,               // int        ctrl,
+        null,               // JComponent lowerPanel
+        password,           // String     password
+        saveDataFile,       // File       saveDataFile
+        workingDirName      // String     workingDirName
         );
-//
+// Figure out type of container
     JFrame jfr = ( cont instanceof JFrame ) ? (JFrame)cont : null;
     JInternalFrame jifr = ( cont instanceof JInternalFrame ) ? (JInternalFrame)cont : null;
     JDialog jdlg = ( cont instanceof JDialog ) ? (JDialog)cont : null;
-//
+// If necessary, pick default title
     if ( title == null ) title = "SwingMyEditorZ00Handler";
-//
+// Handle container size
     if ( sizeX < 50 ) sizeX = 50;
     if ( sizeY < 50 ) sizeY = 50;
     editorPanel.setPreferredSize( new Dimension(sizeX, sizeY) );
+// Get Icon image
+    Image img = SwingMyEditorZ11Misc.myGetImage("my_proj/my_lib_resources/my_gifs/jedit_icon_26x26.gif");
 //
+    if ( MyTrace.myDoPrint() ) {
+      MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": about to start GUI and event queue: setup info as follows:");
+      MyTrace.myPrint( myGetInfoString(MyTrace.myIndWithoutPrefix() + "  ", ctrl, editorPanel) );
+    }
+// Do GUI setup for various types of containers and then set visible
     if ( jfr != null ) {
       jfr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       jfr.setTitle(title);
+      if ( img != null ) jfr.setIconImage(img);
       jfr.addWindowListener(editorPanel);
       if ( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 ) jfr.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
       jfr.setContentPane(editorPanel);
@@ -559,6 +668,7 @@ public final class SwingMyEditorZ03Handler {
     else if ( jdlg != null ) {
       jdlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       jdlg.setTitle(title);
+      if ( img != null ) jdlg.setIconImage(img);
       jdlg.addWindowListener(editorPanel);
       if ( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 ) jdlg.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
       jdlg.setContentPane(editorPanel);
@@ -566,23 +676,23 @@ public final class SwingMyEditorZ03Handler {
       jdlg.setLocationRelativeTo(null);
       jdlg.setVisible(true);
     }
+// Set initial focus to the text entry area
+    editorPanel.myGetTextArea().requestFocus();
 //
-//    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln(MyTrace.myInd() + MyTrace.myGetMethodName() + ": just set visible" + ": ctrl= 0x" + Integer.toHexString(ctrl)
-//      + MyTrace.myNlInd() + " dir= " + workingDirName
-//      + MyTrace.myNlInd() + " file= " + (saveDataFile == null ? "null" : saveDataFile.getAbsolutePath()));
-//
-    editorPanel.mySetStartingFocusToTextArea();
-//
+    if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": exiting");
+// Return SwingMyEditorZ04JPanel editorPanel
     return editorPanel;
   } //End: Method
 
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method creates and returns a default JMenuBar
  *
- * @param ctrl  ?
+ * @param pan  ?
+ * @param additionalItemsOrNull ?
  *
+ * @return  Returns a default JMenuBar
  */
   public static final JMenuBar myGetDefaultMenu (
       SwingMyEditorZ04JPanel   pan,
@@ -597,26 +707,6 @@ public final class SwingMyEditorZ03Handler {
         );
 //
     return menu;
-  } //End: Method
-
-
-//------------------ Main Method ------------------
-/**
-  * This main method runs some tests.
-  * 
-  * @param args String[] of input arguments
-  * 
-  */
-  public static void main( String[] args )
-  {
-    if ( args.length == 0 ) args = new String[] {
-       SwingMyEditorConst.ARG_ALLOW_FILE_OPS,
-       SwingMyEditorConst.ARG_ALLOW_READ_WRITE,
-       SwingMyEditorConst.ARG_WORKING_DIR, "/tmp",
-       SwingMyEditorConst.ARG_TITLE, "Editor Test"
-       };
-    SwingMyEditorZ03Handler.myInitialize(args, false);
-//    SwingMyEditorZ03Handler.myInitialize(args, true);
   } //End: Method
 
 
