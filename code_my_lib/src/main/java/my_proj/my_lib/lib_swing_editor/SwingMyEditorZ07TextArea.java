@@ -69,19 +69,19 @@ import my_proj.my_lib.lib_swing.SwingMyStandardFonts;
 public final class SwingMyEditorZ07TextArea extends JTextArea {
   
 //private static final boolean         DO_TRACE = true;
-
+  
 /** Serial UID */
   private static final long serialVersionUID = -7941194344589361384L;
 
 /** Enum list of edit modes */
           static enum MY_MODES { cmd, ins }
-
+  
 /** Edit mode */
   private MY_MODES                     myCurrentMode = MY_MODES.ins;
   
 /** Setup control int */
   private int                          myCtrl = 0;
- 
+  
 /** Saved data file */
   private File                         mySavedDataFile = null;
   
@@ -163,8 +163,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
     this.myHandleKeyCmdTypedHandler = new SwingMyEditorZ10HandleKeyTyped(this, this.myMsgLine);
 //
 // Might want to prevent saving back encrypted files as plain text
-    this.myAllowFileSave = (this.myCtrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0;
-    this.myAllowFileSaveAsEncrypted = (this.myCtrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0;
+    this.myAllowFileSave = (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE) != 0;
+    this.myAllowFileSaveAsEncrypted = (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE) != 0;
 //
     this.myChanged = false;
     this.myDidFileSave = false;
@@ -174,7 +174,7 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 //
     this.mySavedDataFile = saveDataFile;
 // If can't write then force into cmd mode
-    boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+    boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ANY_WRITE) != 0;
     if ( !canWrite ) this.mySetMode(MY_MODES.cmd);
     else this.mySetMode(MY_MODES.ins);
 //
@@ -187,12 +187,12 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
     super.addKeyListener(
         new KeyListener() {
           @Override public void keyTyped(KeyEvent e) {
-            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ANY_WRITE) != 0;
             SwingMyEditorZ07TextArea.this.myHandleKeyTyped(e, canWrite);
           }
           @Override public void keyPressed(KeyEvent e) { }
           @Override public void keyReleased(KeyEvent e) {
-            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorConst.MY_ALLOW_ANY_WRITE) != 0;
+            boolean canWrite = (SwingMyEditorZ07TextArea.this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ANY_WRITE) != 0;
             if( SwingMyEditorZ07TextArea.this.myCurrentMode == MY_MODES.cmd ) SwingMyEditorZ07TextArea.this.myHandleKeyReleasedInCommandMode(e, canWrite);
           }
         }
@@ -407,8 +407,8 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
  */
   private final boolean myAllowWrite( ) {
     boolean writable = (
-                         (this.myPassword != null && (this.myCtrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0 ) ||
-                         (this.myPassword == null && (this.myCtrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0 )
+                         (this.myPassword != null && (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE) != 0 ) ||
+                         (this.myPassword == null && (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE) != 0 )
                        );
     return writable;
   } //End: Method
@@ -669,7 +669,7 @@ public final class SwingMyEditorZ07TextArea extends JTextArea {
 /**
  * This method ?
  *
- * @return    Returns allowed actions
+ * @return  Returns allowed actions
  */
   public final SwingMyEditorZ05Action myGetActions () { return this.myActions; }
 

@@ -1,22 +1,18 @@
 /**
- * This package contains the runnable program jedit.
- * <p>
- * This is my first try at GitHub. It is a simple text editor written in Java using Swing.
- * My main motivation is to get familiar with how GitHub Java projects are organized,
- * although the jedit program itself may be of interest to some.
- * <p>
- * The text editor stuff is contained in my_proj.my_lib.lib_swing_editor with supporting
- * stuff in other libraries under my_proj.my_lib.
- * <p>
- * The my_proj.my_lib.lib_swing_editor directory contains 3 top level classes.
+ * This package contains the runnable program "jedit" which is a text editor for Java.
+ * It is similar to a simplified VIM program.
+ * The program is implemented using the Swing library.
+ * The GUI mode is built into the Swing library and behaves in a pretty standard way.
+ * The command line mode has been added on and looks like a simplified vi with a limited set of commands.
  * <pre>
- *   SwingMyEditorJFrame         -> The editor sitting inside a JFrame for stand alone use
- *   SwingMyEditorJInternalFrame -> The editor sitting inside a JInternalFrame for use inside
- *                                  a JFrame of another project
- *   SwingMyEditorJDialog        -> The editor sitting inside a JDialog for use as a dialog
- *                               -> inside another project
+ * Modes are as follows:
+ *   GUI: works in parallel with Vi->Text mode
+ *   Vi:
+ *     Text mode: enter from command mode by typing \"i\" or \"a\"
+ *     Command mode: enter from text mode with &lt;esc&gt; key
+ *       Direct: command executed by typing in edit window
+ *       CmdLn: type \":\" for cmd line then enter command and return
  * </pre>
- * 
  * @author James Everitt
  */
 //

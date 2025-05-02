@@ -39,7 +39,7 @@ import my_proj.my_lib.lib.MyTrace;
  */
 final class SwingMyEditorZ10HandleKeyTyped {
   
-//  private static final boolean DO_TRACE = true;
+//private static final boolean DO_TRACE = true;
   
   private SwingMyEditorZ07TextArea myTextArea = null;
 
@@ -84,18 +84,18 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   final void myHandleCommandKey( char keyChar, boolean canWrite )
   {
-//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + "key= " + keyChar);
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + ": key= " + keyChar + ": equals n = " + (keyChar == 'n') );
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + "key= " + keyChar );
-//Move cursor
+// Move cursor
     if ( keyChar == 'j' || keyChar == 'k' || keyChar == 'h' || keyChar == 'l' ) this.myHandleCommandKey_h_j_k_l(keyChar);
-//Delete char
-    else if ( keyChar == 'x' ) if ( canWrite ) this.myHandleCommandKey_x();
-//Find next string
+// Delete char
+    else if ( keyChar == 'x' ) { if ( canWrite ) this.myHandleCommandKey_x(); }
+// Find next string
     else if ( keyChar == 'n' ) this.myHandleCommandKey_n(true);
     else if ( keyChar == 'N' ) this.myHandleCommandKey_n(false);
 // Put back yanked stuff
-    else if ( keyChar == 'p' ) if ( canWrite ) this.myHandleCommandKey_p();
-//Handle multiple key commands
+    else if ( keyChar == 'p' ) { if ( canWrite ) this.myHandleCommandKey_p(); }
+// Handle multiple key commands
     else this.myHandleCommandKey_multiple( keyChar, canWrite );
   } //End: Method
 
@@ -109,6 +109,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_multiple ( char keyChar, boolean canWrite )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + "key= " + keyChar );
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + "key= " + keyChar );
 // Add character to command string buffer
     if ( this.myCmdStrBuf == null ) this.myCmdStrBuf = new StringBuffer();
@@ -153,6 +154,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_yy ( int numbLines, boolean doDelete )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() );
     String txt = this.myTextArea.getText();
 // Get range
     int pos = this.myTextArea.getCaretPosition();
@@ -183,6 +185,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_h_j_k_l ( char keyChar )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() );
     int pos = this.myTextArea.getCaretPosition();
     String txt = this.myTextArea.getText();
     int len = txt.length();
@@ -227,6 +230,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   final void myHandleFindStr( String strToShiftTo, int startIndx, boolean goForward )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() );
     String txt =  this.myTextArea.getText();
     int indxOfStr = -1;
 //
@@ -256,6 +260,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_n( boolean goForward )
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() + ": fwd= " + goForward);
     if ( this.myTextToFind != null ) {
      int pos = this.myTextArea.getCaretPosition();
      this.myHandleFindStr( this.myTextToFind, pos, goForward );
@@ -271,6 +276,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_x()
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() );
     int pos = this.myTextArea.getCaretPosition();
     if ( pos < this.myTextArea.getText().length() ) {
       this.myTextArea.replaceRange(null, pos, pos+1);
@@ -286,6 +292,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
  */
   private final void myHandleCommandKey_p()
   {
+//if(DO_TRACE)System.out.println(MyTrace.myGetMethodName() );
     if ( this.mySavedYanked != null ) {
       int pos = this.myTextArea.getCaretPosition();
       int strt = this.myZ02ThisOrNextNewLine(pos) + 1;

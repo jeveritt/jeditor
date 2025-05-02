@@ -1,10 +1,14 @@
 #!/bin/bash
 
+doFull="no"
+
 javadocExe="/usr/bin/javadoc"
 
 sourceTopPath=".."
 libSourcePath="${sourceTopPath}/code_my_lib/src/main/java"
+libSourceCodePath="${libSourcePath}/my_proj/my_lib"
 projSourcePath="${sourceTopPath}/code_jeditor/src/main/java"
+projSourceCodePath="${projSourcePath}/my_proj/jeditor"
 
 tmpDir="/tmp"
 docDir="java_editor_documentation"
@@ -25,9 +29,25 @@ pkgList="\
    my_proj.jeditor \
 "
 
+fileList="\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorArgs.java\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorCtrl.java\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJDialog.java\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJFrame.java\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJInternalFrame.java\
+   ${projSourceCodePath}/jedit.java\
+"
+
+if [ ${doFull} = "yes" ]; then list=${pkgList}
+else list=${fileList}
+fi
+
 title="Java Editor"
 
-${javadocExe} -sourcepath ${libSourcePath}:${projSourcePath} -d "${outputDir}" -doctitle "${title}" -overview ${libOverviewFile} -author -use -public ${pkgList}
+#type="-public"
+type="-package"
+
+${javadocExe} -sourcepath ${libSourcePath}:${projSourcePath} -d "${outputDir}" -doctitle "${title}" -overview ${libOverviewFile} -author -use ${type} ${list}
 
 cd ${tmpDir}
 #echo wd = `pwd`

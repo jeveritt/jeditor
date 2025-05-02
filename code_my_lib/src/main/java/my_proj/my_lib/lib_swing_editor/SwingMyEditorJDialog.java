@@ -40,7 +40,7 @@ import my_proj.my_lib.lib_swing.SwingMyImages;
 
 //------------------  CLASS: SwingMyEditorJDialog  ------------------
 /**
- * This class
+ * This class creates a dialog text editor by extending JDialog, creating the editor, and then setting the editor as the content pane of the JDialog.
  *
  * @author James Everitt
  */
@@ -63,12 +63,12 @@ public final class SwingMyEditorJDialog extends JDialog
 
 //------------------  Method  ------------------
 /**
- * This constructor method ?
+ * This constructor method constructs the dialog
  * 
- * @param owner  ?
- * @param title  ?
- * @param dataFile  ?
- * @param ctrl  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param dataFile  Starting file or null.
+ * @param ctrl      Int specifying editor options.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -96,14 +96,14 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  * 
- * @param owner  ?
- * @param title  ?
- * @param dataFile  ?
- * @param ctrl  ?
- * @param sizeX  ?
- * @param sizeY  ?
- * @param modalityType ?
- * @param custom  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param dataFile  Starting file or null.
+ * @param ctrl      Int specifying editor options.
+ * @param sizeX     Width of the dialog in pixels.
+ * @param sizeY     Height of the dialog in pixels.
+ * @param modalityType Dialog modal type.
+ * @param custom    JMenu array of custom menus to be added to the menu bar.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -130,9 +130,9 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  * 
- * @param owner  ?
- * @param title  ?
- * @param ctrl  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param ctrl      Int specifying editor options.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -149,10 +149,10 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  *
- * @param owner  ?
- * @param title  ?
- * @param list  ?
- * @param ctrl  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param list      ArrayList of starting data.
+ * @param ctrl      Int specifying editor options.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -169,12 +169,12 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  *
- * @param owner  ?
- * @param title  ?
- * @param list  ?
- * @param ctrl  ?
- * @param modalityType  ?
- * @param customMenu  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param list      ArrayList of starting data.
+ * @param ctrl      Int specifying editor options.
+ * @param modalityType Dialog modal type.
+ * @param customMenu  JMenu array of custom menus to be added to the menu bar.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -202,10 +202,10 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  *
- * @param owner  ?
- * @param title  ?
- * @param dataStr  ?
- * @param ctrl  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param dataStr   String of starting data.
+ * @param ctrl      Int specifying editor options.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -222,14 +222,14 @@ public final class SwingMyEditorJDialog extends JDialog
 /**
  * This constructor method ?
  *
- * @param owner  ?
- * @param title  ?
- * @param dataStr  ?
- * @param ctrl  ?
- * @param sizeX  ?
- * @param sizeY  ?
- * @param modalityType ?
- * @param custom  ?
+ * @param owner     Owner of the dialog which is a subclass of Window.
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param dataStr   String of starting data.
+ * @param ctrl      Int specifying editor options.
+ * @param sizeX     Width of the dialog in pixels.
+ * @param sizeY     Height of the dialog in pixels.
+ * @param modalityType Dialog modal type.
+ * @param custom   JMenu array of custom menus to be added to the menu bar.
  *
  * @throws Exception  Throws standard Java exception
  */
@@ -253,9 +253,9 @@ public final class SwingMyEditorJDialog extends JDialog
 
 //------------------  Method  ------------------
 /**
- * This method ?
+ * This method returns the SwingMyEditorZ04JPanel edit panel.
  *
- * @return  ?
+ * @return  Returns the panel.
  */
   public final SwingMyEditorZ04JPanel myGetEditorPanel ( ) { return this.myEditorPanel; }
   

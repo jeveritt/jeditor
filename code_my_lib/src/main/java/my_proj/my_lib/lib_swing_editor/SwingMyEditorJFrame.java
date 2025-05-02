@@ -37,7 +37,7 @@ import my_proj.my_lib.lib_swing.SwingMyImages;
 
 //------------------  CLASS: SwingMyEditorJFrame  ------------------
 /**
- * This class
+ * This class creates a stand alone text editor by extending JFrame, creating the editor, and then setting the editor as the content pane of the JFrame.
  *
  * @author James Everitt
  */
@@ -60,7 +60,7 @@ public final class SwingMyEditorJFrame extends JFrame
 
 //------------------  Method  ------------------
 /**
- * This constructor method is called within the main method and uses MyApplicationInterface.
+ * This constructor method creates the JFrame and then constructs the editor using an array of arguments.
  *
  * @param args  String[] of arguments for the program.
  */
@@ -97,11 +97,11 @@ public final class SwingMyEditorJFrame extends JFrame
 /**
  * This constructor method can be called directly from within a Java program.
  * 
- * @param title  ?
- * @param dataFile  ?
- * @param ctrl  ?
- * @param sizeX  ?
- * @param sizeY  ?
+ * @param title     Title for the JFrame tile bar. If null and a file is specified the file name is used.
+ * @param dataFile  Starting file or null.
+ * @param ctrl      Int specifying editor options.
+ * @param sizeX     Width of the JFrame in pixels.
+ * @param sizeY     Height of the JFrame in pixels.
  *
  * @throws Exception  Java standard exception 
  */
@@ -158,11 +158,11 @@ public final class SwingMyEditorJFrame extends JFrame
        SwingMyEditorZ11Misc.myCreateFile(new File(tmpFileName), "0123\n5678\n0123\n5678\n", true);
  //
        args = new String[] {
-           SwingMyEditorConst.ARG_FILE, tmpFileName,
-           SwingMyEditorConst.ARG_NO_MENU,
-           SwingMyEditorConst.ARG_SIZE_X, "800",
-           SwingMyEditorConst.ARG_SIZE_Y, "600",
-           SwingMyEditorConst.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+           SwingMyEditorArgs.ARG_FILE, tmpFileName,
+           SwingMyEditorArgs.ARG_NO_MENU,
+           SwingMyEditorArgs.ARG_SIZE_X, "800",
+           SwingMyEditorArgs.ARG_SIZE_Y, "600",
+           SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
            "-nolic",
            "-noconsole"
        };
@@ -174,11 +174,11 @@ public final class SwingMyEditorJFrame extends JFrame
       SwingMyEditorZ11Misc.myCreateFile(new File(tmpFileName), "0123\n5678\n0123\n5678\n", true);
 //
       args = new String[] {
-          SwingMyEditorConst.ARG_FILE, tmpFileName,
-          SwingMyEditorConst.ARG_ALLOW_READ_WRITE,
-          SwingMyEditorConst.ARG_SIZE_X, "800",
-          SwingMyEditorConst.ARG_SIZE_Y, "600",
-          SwingMyEditorConst.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+          SwingMyEditorArgs.ARG_FILE, tmpFileName,
+          SwingMyEditorArgs.ARG_ALLOW_READ_WRITE,
+          SwingMyEditorArgs.ARG_SIZE_X, "800",
+          SwingMyEditorArgs.ARG_SIZE_Y, "600",
+          SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
           "-nolic",
           "-noconsole"
       };
@@ -189,10 +189,10 @@ public final class SwingMyEditorJFrame extends JFrame
       String tmpFileName =  MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFile.txt";
 //
       args = new String[] {
-          SwingMyEditorConst.ARG_FILE, tmpFileName,
-          SwingMyEditorConst.ARG_SIZE_X, "800",
-          SwingMyEditorConst.ARG_SIZE_Y, "600",
-          SwingMyEditorConst.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+          SwingMyEditorArgs.ARG_FILE, tmpFileName,
+          SwingMyEditorArgs.ARG_SIZE_X, "800",
+          SwingMyEditorArgs.ARG_SIZE_Y, "600",
+          SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
           "-nolic",
           "-noconsole"
       };
@@ -214,12 +214,12 @@ public final class SwingMyEditorJFrame extends JFrame
       }
 //
       args = new String[] {
-          SwingMyEditorConst.ARG_FILE, tmpFileName,
-          SwingMyEditorConst.ARG_PASSWORD, password,
-          SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE,
-          SwingMyEditorConst.ARG_SIZE_X, "800",
-          SwingMyEditorConst.ARG_SIZE_Y, "600",
-          SwingMyEditorConst.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+          SwingMyEditorArgs.ARG_FILE, tmpFileName,
+          SwingMyEditorArgs.ARG_PASSWORD, password,
+          SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
+          SwingMyEditorArgs.ARG_SIZE_X, "800",
+          SwingMyEditorArgs.ARG_SIZE_Y, "600",
+          SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
           "-nolic",
           "-noconsole"
       };
@@ -228,9 +228,9 @@ public final class SwingMyEditorJFrame extends JFrame
 // View encrypted directory
     else if ( testType == 5 ) {
       args = new String[] {
-       SwingMyEditorConst.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
-       SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED,
-       SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE,
+       SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+       SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED,
+       SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
        "-nolic",
        "-noconsole"
       };
@@ -256,9 +256,23 @@ public final class SwingMyEditorJFrame extends JFrame
 // ------------------ Main Method ------------------
 /**
  * This method is the runnable main method.
+ * <pre>
+ *  Arguments are:
+ *    -file &lt;file_name&gt;           : File to be opened at start of program
+ *    -dir &lt;directory_name&gt;       : Start editor pointing to specified directory
+ *    -ro                         : Set editor to read only
+ *    -rw                         : Set editor to read/write
+ *    -pw &lt;password&gt;              : Password for encrypted file
+ *    -isenc                      : Indicates file is encrypted
+ *    -enro                       : Set editor to encrypted read only
+ *    -enrw                       : Set editor to encrypted read/write
+ *    -nomenu                     : No menus implies only view starting file
+ *    -sizex &lt;width&gt;              : Width of GUI
+ *    -sizey &lt;height&gt;             : Height of GUI
+ *    -help                       : Prints this message and exits
+ * </pre>
  * 
  * @param args String[] of input arguments
- * 
  */
   public static void main( String[] args )
   {

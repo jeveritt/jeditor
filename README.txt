@@ -19,7 +19,18 @@
     the fact that it is fairly minimal allows the editor to be easily
     merged into other Java programs.
 
-    To run this example you need to install the Java SDK.
+    To compile and run the code you need to install the SDK.
+
+
+  To Try It Out:
+
+    Ensure the Java Runtime Environment (JRE) or the JDK is installed.
+
+    Download target/jeditor.jar
+
+    Type:
+       java  -cp  <path_to_jar>/jeditor.jar  my_proj.jeditor.jedit
+
 
   ORGINIZATION:
 
@@ -84,7 +95,7 @@
       |-- .gitignore
       |-- LICENSE
       |-- README.txt = this file
-      |-- java_editor_documentation.zip
+      |-- java_editor_documentation.zip = compressed documentation
       |-- tools = various scripts
       |   |-- build
       |   |   |-- build.xml = file called by ant to build jeditor.jar

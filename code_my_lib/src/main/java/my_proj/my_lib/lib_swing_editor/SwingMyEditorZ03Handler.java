@@ -104,7 +104,7 @@ public final class SwingMyEditorZ03Handler {
  *
  * @param indent  ?
  * 
- * @return  Returns help
+ * @return Returns help String
  */
   public static final String myGetHelp ( String indent )
   {
@@ -118,7 +118,7 @@ public final class SwingMyEditorZ03Handler {
     if ( indent == null ) indent = "";
 //
     String description =
-          "The \"" + programPathName + "\" program provices a simple vi like text editor written in Java." +
+          "The \"" + programPathName + "\" program provides a simple vi like text editor written in Java." +
           "\n  A sub-class can also be incorporated into other Java programs to provide a file editor function.";
 //
     myAppGetHelpStandardVerbage( indent, programPathName, description, sb );
@@ -227,23 +227,23 @@ public final class SwingMyEditorZ03Handler {
         MyApplicationInterface.ARG_NO_LIC,
         MyApplicationInterface.ARG_VERBOSE,
         MyApplicationInterface.ARG_QUIET,
-        SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED,
-        SwingMyEditorConst.ARG_ALLOW_READ_ONLY,
-        SwingMyEditorConst.ARG_ALLOW_READ_WRITE,
-        SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_ONLY,
-        SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE,
-        SwingMyEditorConst.ARG_NO_MENU
+        SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED,
+        SwingMyEditorArgs.ARG_ALLOW_READ_ONLY,
+        SwingMyEditorArgs.ARG_ALLOW_READ_WRITE,
+        SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_ONLY,
+        SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
+        SwingMyEditorArgs.ARG_NO_MENU
       };
 //
     String[] allowableDoubleArgs = new String[] {
         MyApplicationInterface.ARG_VERBOSE,
-        SwingMyEditorConst.ARG_TITLE,
-        SwingMyEditorConst.ARG_FILE,
-        SwingMyEditorConst.ARG_CONTROL,
-        SwingMyEditorConst.ARG_PASSWORD,
-        SwingMyEditorConst.ARG_SIZE_X,
-        SwingMyEditorConst.ARG_SIZE_Y,
-        SwingMyEditorConst.ARG_WORKING_DIR
+        SwingMyEditorArgs.ARG_TITLE,
+        SwingMyEditorArgs.ARG_FILE,
+//        SwingMyEditorCtrl.ARG_CONTROL,
+        SwingMyEditorArgs.ARG_PASSWORD,
+        SwingMyEditorArgs.ARG_SIZE_X,
+        SwingMyEditorArgs.ARG_SIZE_Y,
+        SwingMyEditorArgs.ARG_WORKING_DIR
       };
 //
     String[] allowableMultArgs = null;
@@ -276,26 +276,26 @@ public final class SwingMyEditorZ03Handler {
   {
     int ctrl = 0;
 //
-    boolean canReadUnencrypt    = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_READ_ONLY) ||
-                                  MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_READ_WRITE);
-    boolean canReadEncrypted    = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_ONLY) ||
-                                  MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE);
-    boolean canWriteUnencrypted = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_READ_WRITE);
-    boolean canWriteEncrypted   = MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_ALLOW_ENCRYPTED_READ_WRITE);
+    boolean canReadUnencrypt    = MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_READ_ONLY) ||
+                                  MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_READ_WRITE);
+    boolean canReadEncrypted    = MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_ONLY) ||
+                                  MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE);
+    boolean canWriteUnencrypted = MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_READ_WRITE);
+    boolean canWriteEncrypted   = MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE);
 //
-    if ( canReadUnencrypt ) ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ;
+    if ( canReadUnencrypt ) ctrl = ctrl | SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_READ;
 //
-    if ( canWriteUnencrypted ) ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE;
+    if ( canWriteUnencrypted ) ctrl = ctrl | SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE;
 //
-    if ( canReadEncrypted ) ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_ENCRYP_READ;
+    if ( canReadEncrypted ) ctrl = ctrl | SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ;
 //
-    if ( canWriteEncrypted ) ctrl = ctrl | SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE;
+    if ( canWriteEncrypted ) ctrl = ctrl | SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE;
 //
-    if ( MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_NO_MENU) ) ctrl = ctrl | SwingMyEditorConst.MY_NO_MENU;
+    if ( MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_NO_MENU) ) ctrl = ctrl | SwingMyEditorCtrl.MY_NO_MENU;
 //
-    if  ( MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED) ||
+    if  ( MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED) ||
           ( !canReadUnencrypt && canReadEncrypted ) )
-        ctrl = ctrl | SwingMyEditorConst.MY_IS_ENCRYPT;
+        ctrl = ctrl | SwingMyEditorCtrl.MY_IS_ENCRYPT;
 //
     return ctrl;
   } //End: Method
@@ -333,7 +333,7 @@ public final class SwingMyEditorZ03Handler {
   {
     StringBuffer sb = new StringBuffer();
 //
-    SwingMyEditorConst.myGetEditorConstInfo( ctrl, sb, ind);
+    SwingMyEditorCtrl.myGetEditorCtrlInfo( ctrl, sb, ind);
     editPan.myGetTextArea().myGetInfoString(ind, sb);
 //
     return sb.toString();
@@ -355,9 +355,9 @@ public final class SwingMyEditorZ03Handler {
       )
   {
 // Possibly set trace
-    int verboseLvl = MyReadOption.myIntValueAfterKey( -1, args, SwingMyEditorConst.ARG_VERBOSE );
+    int verboseLvl = MyReadOption.myIntValueAfterKey( -1, args, SwingMyEditorArgs.ARG_VERBOSE );
     if ( verboseLvl > 0 ) {
-      String verboseFileNm = MyReadOption.myValueAfterKey(args, SwingMyEditorConst.ARG_TRACE_OUTPUT);
+      String verboseFileNm = MyReadOption.myValueAfterKey(args, SwingMyEditorArgs.ARG_TRACE_OUTPUT);
       if ( verboseFileNm == null ) verboseFileNm = MyMisc.myGetTmpDirectory() + "/zz_lib_swing_editor_trace.txt";
       MyTrace.mySetVerboseLevel(verboseLvl, verboseFileNm);
     }
@@ -373,28 +373,28 @@ public final class SwingMyEditorZ03Handler {
 // Define font
     
 // Starting file name or null
-    String fileName = ( args.length == 1 ) ? args[0] : MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_FILE);
+    String fileName = ( args.length == 1 ) ? args[0] : MyReadOption.myValueAfterKey(null, args, SwingMyEditorArgs.ARG_FILE);
     File startingDataFile = ( fileName == null ) ? null : new File(fileName);
 // Title
     String title;
     if ( fileName == null ) title = "Empty File";
     else title = myGetFileNameWithNameBeforePath(fileName);
 // Password
-    String password = MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_PASSWORD);
+    String password = MyReadOption.myValueAfterKey(null, args, SwingMyEditorArgs.ARG_PASSWORD);
 // Control int
     int ctrl = myGetCtrlIntFromInputArgs(args);
 // Handle encryption
     boolean startingDataFileIsEncrypted = startingDataFile != null &&
         startingDataFile.isFile() &&
-        (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ) != 0 &&
+        (ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ) != 0 &&
         ( startingDataFile.getName().endsWith(SwingMyEditorConst.MY_ENCRYPT_EXTENSION) ||
-          MyReadOption.myKeyExists(args, SwingMyEditorConst.ARG_FILE_IS_ENCRYPTED ) )
+          MyReadOption.myKeyExists(args, SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED ) )
         ;
 // Define size
-    int sizeX = MyReadOption.myIntValueAfterKey(600, args, SwingMyEditorConst.ARG_SIZE_X);
-    int sizeY = MyReadOption.myIntValueAfterKey(400, args, SwingMyEditorConst.ARG_SIZE_Y);
+    int sizeX = MyReadOption.myIntValueAfterKey(600, args, SwingMyEditorArgs.ARG_SIZE_X);
+    int sizeY = MyReadOption.myIntValueAfterKey(400, args, SwingMyEditorArgs.ARG_SIZE_Y);
 // Get working directory
-    String workingDirName = MyReadOption.myValueAfterKey(null, args, SwingMyEditorConst.ARG_WORKING_DIR);
+    String workingDirName = MyReadOption.myValueAfterKey(null, args, SwingMyEditorArgs.ARG_WORKING_DIR);
 // Create editor
     SwingMyEditorZ04JPanel editorPanel = myInitializeFromFile(
         cont,                        // Container      cont,
@@ -446,9 +446,9 @@ public final class SwingMyEditorZ03Handler {
     SwingMyEditorZ04JPanel editorPanel = null;
     try {
 // Figure out permissions
-      boolean readEncrypt = (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ) != 0;
+      boolean readEncrypt = (ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ) != 0;
       boolean readOrWriteEncryp = readEncrypt ||
-                                  (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0;
+                                  (ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE) != 0;
 // If necessary, get password
       if ( password == null && readOrWriteEncryp ) {
         password = MyWriteOrReadGpgFile.myGetStandardPas();
@@ -614,10 +614,10 @@ public final class SwingMyEditorZ03Handler {
       ) {
     if ( MyTrace.myDoPrint() ) MyTrace.myPrintln( MyTrace.myInd() + MyTrace.myGetMethodName() + ": ctrl= 0x" + Integer.toHexString(ctrl) + ": cont= " + (cont == null ? null : cont.getName()) + ": file= " + saveDataFile);
 // If ctrl == 0 which means you can't do anything then set for read/write
-    if ( ctrl == 0 ) ctrl =  SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ | SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE;
+    if ( ctrl == 0 ) ctrl =  SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_READ | SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE;
 // Get password if necessary
-    boolean readOrWriteEncryp = (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ) != 0 ||
-                                (ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0 ;
+    boolean readOrWriteEncryp = (ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ) != 0 ||
+                                (ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE) != 0 ;
     if ( password == null && readOrWriteEncryp ) password = MyWriteOrReadGpgFile.myGetStandardPas();
 // Create edit panel
     SwingMyEditorZ04JPanel editorPanel = new SwingMyEditorZ04JPanel(
@@ -651,7 +651,7 @@ public final class SwingMyEditorZ03Handler {
       jfr.setTitle(title);
       if ( img != null ) jfr.setIconImage(img);
       jfr.addWindowListener(editorPanel);
-      if ( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 ) jfr.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
+      if ( (ctrl & SwingMyEditorCtrl.MY_NO_MENU) == 0 ) jfr.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
       jfr.setContentPane(editorPanel);
       jfr.pack();
       jfr.setLocationRelativeTo(null);
@@ -660,7 +660,7 @@ public final class SwingMyEditorZ03Handler {
     else if ( jifr != null ) {
       jifr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
       jifr.setTitle(title);
-      if ( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 ) jifr.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
+      if ( (ctrl & SwingMyEditorCtrl.MY_NO_MENU) == 0 ) jifr.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
       jifr.setContentPane(editorPanel);
       jifr.pack();
       jifr.setVisible(true);
@@ -670,7 +670,7 @@ public final class SwingMyEditorZ03Handler {
       jdlg.setTitle(title);
       if ( img != null ) jdlg.setIconImage(img);
       jdlg.addWindowListener(editorPanel);
-      if ( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 ) jdlg.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
+      if ( (ctrl & SwingMyEditorCtrl.MY_NO_MENU) == 0 ) jdlg.setJMenuBar( editorPanel.myCreateMenuBar(custom) );
       jdlg.setContentPane(editorPanel);
       jdlg.pack();
       jdlg.setLocationRelativeTo(null);

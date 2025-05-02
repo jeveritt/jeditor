@@ -116,9 +116,9 @@ public final class SwingMyEditorZ04JPanel extends JPanel implements WindowListen
       super.setLayout( new myEditorLayoutManager() );
 // Create command and message lines
       SwingMyEditorZ08CmdLine cmdLine = new SwingMyEditorZ08CmdLine();
-      cmdLine.setVisible( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 );
+      cmdLine.setVisible( (ctrl & SwingMyEditorCtrl.MY_NO_MENU) == 0 );
       SwingMyEditorZ09MsgLine msgLine = new SwingMyEditorZ09MsgLine();
-      msgLine.setVisible( (ctrl & SwingMyEditorConst.MY_NO_MENU) == 0 );
+      msgLine.setVisible( (ctrl & SwingMyEditorCtrl.MY_NO_MENU) == 0 );
 // Add text area and its scroll pane
       this.myTextArea = new SwingMyEditorZ07TextArea(
           textDataAsString,
@@ -213,8 +213,8 @@ public final class SwingMyEditorZ04JPanel extends JPanel implements WindowListen
 
   @Override public void windowClosing(WindowEvent arg0) {
     try {
-      if ( ( (this.myCtrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE) != 0 ||
-             (this.myCtrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE) != 0 )
+      if ( ( (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE) != 0 ||
+             (this.myCtrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE) != 0 )
           && this.myTextArea.myGetHasChanged() ) {
         Container cont = this;
         while ( cont.getParent() != null ) cont = cont.getParent();

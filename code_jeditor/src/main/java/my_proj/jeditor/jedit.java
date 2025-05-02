@@ -32,9 +32,21 @@ import my_proj.my_lib.lib_swing_editor.SwingMyEditorJFrame;
 //-----------------------  CLASS: jedit  --------------------
 //-----------------------------------------------------------
 /**
- * This class runs the text editor.
- * It just calls the JFrame based editor in the library directory.
- * I stuck it here so it's easy to find.
+ * This class runs the stand alone text editor my_proj.jeditor.jedit.
+ * It is similar to a simplified VIM program.
+ * The program is implemented using the Swing library.
+ * The GUI mode is built into the Swing library and behaves in a pretty standard way.
+ * The command line mode has been added on and looks like a simplified vi with a limited set of commands.
+ * <pre>
+ * Modes are as follows:
+ *   GUI: works in parallel with Vi->Text mode
+ *   Vi:
+ *     Text mode: enter from command mode by typing \"i\" or \"a\"
+ *     Command mode: enter from text mode with &lt;esc&gt; key
+ *       Direct: command executed by typing in edit window
+ *       CmdLn: type \":\" for cmd line then enter command and return
+ * </pre>
+
  * 
  * @author James Everitt
  */
@@ -48,7 +60,9 @@ public final class jedit {
 
 //------------------  Method  ------------------
 /**
- * This is the constructor
+ * This constructor calls my_proj.my_lib.lib_swing_editor.SwingMyEditorJFrame which
+ * creates a stand alone text editor by extending JFrame, creating the editor,
+ * and then setting the editor as the content pane of the JFrame.
  * 
  */
   private jedit ( ) {}
@@ -57,6 +71,21 @@ public final class jedit {
 // ------------------ Main Method ------------------
 /**
  * This method is the runnable main method.
+ * <pre>
+ *  Arguments are:
+ *    -file &lt;file_name&gt;           : File to be opened at start of program
+ *    -dir &lt;directory_name&gt;       : Start editor pointing to specified directory
+ *    -ro                         : Set editor to read only
+ *    -rw                         : Set editor to read/write
+ *    -pw &lt;password&gt;              : Password for encrypted file
+ *    -isenc                      : Indicates file is encrypted
+ *    -enro                       : Set editor to encrypted read only
+ *    -enrw                       : Set editor to encrypted read/write
+ *    -nomenu                     : No menus implies only view starting file
+ *    -sizex &lt;width&gt;              : Width of GUI
+ *    -sizey &lt;height&gt;             : Height of GUI
+ *    -help                       : Prints this message and exits
+ * </pre>
  * 
  * @param args String[] of input arguments
  */

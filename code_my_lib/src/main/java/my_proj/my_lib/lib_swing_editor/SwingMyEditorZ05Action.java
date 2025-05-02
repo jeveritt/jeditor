@@ -95,12 +95,12 @@ final class SwingMyEditorZ05Action {
   {
     this.myTextArea = textArea;
 //
-    boolean readOnly = ( ( ctrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ ) != 0 || ( ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ ) != 0 ) &&
-                         ( ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE ) == 0 && ( ctrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE ) == 0 ;
-    boolean openUnencrypFile = ( ctrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_READ ) != 0 && ( ctrl & SwingMyEditorConst.MY_ALLOW_ONLY_SINGLE_FILE ) == 0;
-    boolean openEncrypFile = ( ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_READ ) != 0 && ( ctrl & SwingMyEditorConst.MY_ALLOW_ONLY_SINGLE_FILE ) == 0;
-    boolean saveFileUnencrypt = ( ctrl & SwingMyEditorConst.MY_ALLOW_UNENCRYP_WRITE ) != 0;
-    boolean saveFileEncrypted = ( ctrl & SwingMyEditorConst.MY_ALLOW_ENCRYP_WRITE ) != 0;
+    boolean readOnly = ( ( ctrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_READ ) != 0 || ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ ) != 0 ) &&
+                         ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE ) == 0 && ( ctrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE ) == 0 ;
+    boolean openUnencrypFile = ( ctrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_READ ) != 0 && ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ONLY_SINGLE_FILE ) == 0;
+    boolean openEncrypFile = ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_READ ) != 0 && ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ONLY_SINGLE_FILE ) == 0;
+    boolean saveFileUnencrypt = ( ctrl & SwingMyEditorCtrl.MY_ALLOW_UNENCRYP_WRITE ) != 0;
+    boolean saveFileEncrypted = ( ctrl & SwingMyEditorCtrl.MY_ALLOW_ENCRYP_WRITE ) != 0;
 //
     this.MY_EDIT_COPY = new AbstractAction("copy") {
       private static final long serialVersionUID = 1L;
