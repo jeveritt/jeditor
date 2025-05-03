@@ -128,7 +128,7 @@ final class SwingMyEditorZ10HandleKeyTyped {
 //
       if ( ( frags.size() == 1 && frags.get(0).equals("dd") ) ||
            ( frags.size() == 2 && firstInt > 0 && frags.get(1).equals("dd") ) )
-                         if ( canWrite ) myHandleCommandKey_yy(firstInt, true);
+                         { if ( canWrite ) myHandleCommandKey_yy(firstInt, true); }
       else if ( ( frags.size() == 1 && frags.get(0).equals("yy") ) ||
                 ( frags.size() == 2 && firstInt > 0 && frags.get(1).equals("yy") ) )
                         myHandleCommandKey_yy(firstInt, false);

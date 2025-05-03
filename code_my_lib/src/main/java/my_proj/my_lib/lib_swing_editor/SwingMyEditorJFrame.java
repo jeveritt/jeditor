@@ -69,7 +69,7 @@ public final class SwingMyEditorJFrame extends JFrame
     SwingMyEditorConst.myType = SwingMyEditorConst.MY_TYPE.FRAME; 
     try {
 // If this is a test, redefine args for appropriate test.
-      if ( args.length > 1 && args[0].equals(MyApplicationInterface.ARG_TEST) ) args = this.myReturnTestArgs ( Integer.valueOf(args[1]), args );
+      if ( args.length > 1 && args[0].equals(MyApplicationInterface.ARG_TEST) ) args = myReturnTestArgs ( Integer.valueOf(args[1]), args );
 // If doing help, then print help message
       if  ( args.length > 0 && args[0].equals(MyApplicationInterface.ARG_HELP) ) System.out.print( "\n" + SwingMyEditorZ03Handler.myGetHelp("  ") );
 // Else run program
@@ -142,10 +142,19 @@ public final class SwingMyEditorJFrame extends JFrame
  * 
  * @throws Exception  Java standard exception 
  */
-  private final String[] myReturnTestArgs ( int testType, String[] inputArgs ) throws Exception
+  private static final String[] myReturnTestArgs ( int testType, String[] inputArgs ) throws Exception
   {
-//    return SwingMyEditorZ01AppIfc.myAppReturnEditorTestArgs(testType, inputArgs);
-        String[] args = null;
+    String[] args = null;
+//
+// Create unencrypted test file
+    String tmpFileName = MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFile.txt";
+    if ( !new File(tmpFileName).exists() ) {
+      System.out.println( MyTrace.myGetMethodName() + ": creating " + tmpFileName );
+      SwingMyEditorZ11Misc.myCreateFile(new File(tmpFileName), "0123\n5678\nSee spot run.\nNext is empty\n\n0123\n5678\n", true);
+    }
+//
+// Create encrypted test file
+
 //
 // Set test based on test type
 //
@@ -154,11 +163,9 @@ public final class SwingMyEditorJFrame extends JFrame
 //
 // Just view data
      else if ( testType == 1 ) {
-       String tmpFileName = MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFile.txt";
-       SwingMyEditorZ11Misc.myCreateFile(new File(tmpFileName), "0123\n5678\n0123\n5678\n", true);
- //
+       System.out.println( MyTrace.myGetMethodName() + ": Open empty editor" );
        args = new String[] {
-           SwingMyEditorArgs.ARG_FILE, tmpFileName,
+//           SwingMyEditorArgs.ARG_FILE, tmpFileName,
            SwingMyEditorArgs.ARG_NO_MENU,
            SwingMyEditorArgs.ARG_SIZE_X, "800",
            SwingMyEditorArgs.ARG_SIZE_Y, "600",
@@ -170,9 +177,7 @@ public final class SwingMyEditorJFrame extends JFrame
 //
 // Test un-encrypted file
     else if ( testType == 2 ) {
-      String tmpFileName =  MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFile.txt";
-      SwingMyEditorZ11Misc.myCreateFile(new File(tmpFileName), "0123\n5678\n0123\n5678\n", true);
-//
+      System.out.println( MyTrace.myGetMethodName() + ": Open and possibly edit and save "  + tmpFileName );
       args = new String[] {
           SwingMyEditorArgs.ARG_FILE, tmpFileName,
           SwingMyEditorArgs.ARG_ALLOW_READ_WRITE,
@@ -186,8 +191,7 @@ public final class SwingMyEditorJFrame extends JFrame
 //
 // View un-encrypted file
     else if ( testType == 3 ) {
-      String tmpFileName =  MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFile.txt";
-//
+      System.out.println( MyTrace.myGetMethodName() + ": View "  + tmpFileName );
       args = new String[] {
           SwingMyEditorArgs.ARG_FILE, tmpFileName,
           SwingMyEditorArgs.ARG_SIZE_X, "800",
@@ -197,24 +201,25 @@ public final class SwingMyEditorJFrame extends JFrame
           "-noconsole"
       };
     }
-    
 //
 // Test encrypted file
     else if ( testType == 4 ) {
-      String tmpFileName = MyMisc.myGetTmpDirectory() + File.separator + "swingMyEditor_tmpFileEnc.txt" + SwingMyEditorConst.MY_ENCRYPT_EXTENSION;
+      String tmpEncryptFileName = tmpFileName + SwingMyEditorConst.MY_ENCRYPT_EXTENSION;
       String password = "password";
 //
-      if ( !new File(tmpFileName).exists() ) {
-        String data = "Enc Line 1\nEnc Line 2\nEnc Line 3\n";
+      if ( !new File(tmpEncryptFileName).exists() ) {
+        System.out.println( MyTrace.myGetMethodName() + ": creating " + tmpEncryptFileName );
+        String data = "Enc Line 1\nEnc Line 2\nSee spot run.\nEnc Line 3\n";
         MyWriteOrReadGpgFile.myWriteEncryptedFile(
-          tmpFileName,  // String outputFileName,
+          tmpEncryptFileName,  // String outputFileName,
           data,         // String data,
           password      // String passwordOrNull
         );
       }
 //
+      System.out.println( MyTrace.myGetMethodName() + ": Encrypted file: Open and possibly edit and save "  + tmpEncryptFileName );
       args = new String[] {
-          SwingMyEditorArgs.ARG_FILE, tmpFileName,
+          SwingMyEditorArgs.ARG_FILE, tmpEncryptFileName,
           SwingMyEditorArgs.ARG_PASSWORD, password,
           SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
           SwingMyEditorArgs.ARG_SIZE_X, "800",
@@ -227,18 +232,19 @@ public final class SwingMyEditorJFrame extends JFrame
 //
 // View encrypted directory
     else if ( testType == 5 ) {
+      System.out.println( MyTrace.myGetMethodName() + ": Set up to open encrypted files in " + MyMisc.myGetTmpDirectory() );
       args = new String[] {
-       SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
-       SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED,
-       SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
-       "-nolic",
-       "-noconsole"
+         SwingMyEditorArgs.ARG_WORKING_DIR, MyMisc.myGetTmpDirectory(),
+         SwingMyEditorArgs.ARG_FILE_IS_ENCRYPTED,
+         SwingMyEditorArgs.ARG_ALLOW_ENCRYPTED_READ_WRITE,
+         "-nolic",
+         "-noconsole"
       };
     }
 //
 // Print out info
 //
-    MyApplicationInterface.myAppPrintTestArgs ( testType, args, "SwingMyEditorJFrame.myAppReturnTestArgs" );
+    MyApplicationInterface.myAppPrintTestArgs ( testType, args, MyTrace.myGetMethodName() );
 //
     return args;
   } //End: method
