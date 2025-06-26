@@ -1,6 +1,7 @@
 #!/bin/bash
 
 doFull="no"
+#doFull="yes"
 
 javadocExe="/usr/bin/javadoc"
 
@@ -30,12 +31,12 @@ pkgList="\
 "
 
 fileList="\
-   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorArgs.java\
-   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorCtrl.java\
-   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJDialog.java\
-   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJFrame.java\
-   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJInternalFrame.java\
-   ${projSourceCodePath}/jedit.java\
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorArgs.java \
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorCtrl.java \
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJDialog.java \
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJFrame.java \
+   ${libSourceCodePath}/lib_swing_editor/SwingMyEditorJInternalFrame.java \
+   ${projSourceCodePath}/jedit.java \
 "
 
 if [ ${doFull} = "yes" ]; then list=${pkgList}

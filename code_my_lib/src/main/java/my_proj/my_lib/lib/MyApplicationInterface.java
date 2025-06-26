@@ -1,10 +1,8 @@
 // MyApplicationInterface.java
 /*
  * Copyright (C) 2009 James Everitt
- *
- * This file is part of Open Schematic Capture.
  * 
- * Open Schematic Capture is free software: you can redistribute it
+ * This program is free software: you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation, either version 3 of
  * the License, or (at your option) any later version.
@@ -162,9 +160,10 @@ System.out.println("\n" + MyTrace.myGetMethodName()
  * @param testType  ?
  * @param args  ?
  * @param programName  ?
+ * @param msg  ?
  *
  */
-  static void myAppPrintTestArgs ( int testType, String[] args, String programName )
+  static void myAppPrintTestArgs ( int testType, String[] args, String programName, String msg )
   {
 //
 // Print out info
@@ -172,7 +171,8 @@ System.out.println("\n" + MyTrace.myGetMethodName()
     if ( args == null ) System.out.println(programName + ": bad test = " + testType);
     else {
       System.out.println("-----------------------------------------------------------------------------------");
-      System.out.println(programName + ": doing test " + testType);
+      System.out.println( programName + ": doing test " + testType );
+      if ( msg != null ) System.out.println( msg );
 //
       if ( args.length > 0 ) {
         System.out.println("  args:");

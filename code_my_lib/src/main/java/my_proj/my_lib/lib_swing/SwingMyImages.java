@@ -1,4 +1,21 @@
 // SwingMyImages.java
+/*
+ *
+ * Copyright (C) 2013,2024 James Everitt
+ *
+ * This program is free software: you can redistribute it
+ * and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // Package statement
 package my_proj.my_lib.lib_swing;
@@ -24,7 +41,7 @@ import my_proj.my_lib.lib.MyTrace;
  */
 public class SwingMyImages {
 
-//  private static final boolean DO_TRACE = true;
+//private static final boolean DO_TRACE = true;
   
 /** Standard image path */
   public static final String myStdImagePath = "my_proj/my_lib_resources/my_gifs/";
@@ -69,7 +86,7 @@ public class SwingMyImages {
       if (imageURL != null ) img = Toolkit.getDefaultToolkit().getImage(imageURL);
 /*
 if(DO_TRACE) {
- System.out.println("\n" + MyTrace.myGetMethodName() + ": imageFile= " + imageFileName + ": URL= " + imageURL);
+ System.out.println("\n" + MyTrace.myGetMethodName() + "\n imageFile= " + imageFileName + "\n URL= " + imageURL + "\n img = " + img);
  System.out.println(" packages:");
  Package[] packages = cldr.getDefinedPackages();
  Package found = null;
